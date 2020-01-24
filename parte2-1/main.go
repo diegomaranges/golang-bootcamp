@@ -20,6 +20,7 @@ func main() {
 		fmt.Println("retrive -> for show all elements")
 		fmt.Println("update  -> for replace an element")
 		fmt.Println("delete  -> for delete an element")
+		fmt.Println("exit")
 		fmt.Print(">>")
 
 		inputType.Scan()
@@ -38,6 +39,9 @@ func main() {
 
 		case "delete":
 			deleteElement()
+
+		case "exit":
+			return
 
 		default:
 			fmt.Println("not valid option")
