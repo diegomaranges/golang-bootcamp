@@ -9,10 +9,17 @@ import (
 
 func main() {
 	var option string
-	var sliceWithElements []string
+	var stringMap map[string]string
+	stringMap = make(map[string]string)
 	inputType := bufio.NewScanner(os.Stdin)
 
 	for {
+		fmt.Println("")
+		fmt.Println("*************************")
+		for key, value := range stringMap {
+			fmt.Println(key + ": " + value)
+		}
+		fmt.Println("*************************")
 
 		fmt.Println("select an option:")
 		fmt.Println("add     -> for add a new element")
@@ -28,16 +35,16 @@ func main() {
 
 		switch option {
 		case "add":
-			sliceWithElements = addElement(sliceWithElements)
+			addElement(stringMap)
 
 		case "retrive":
-			showElements(sliceWithElements)
+			showElement(stringMap)
 
 		case "update":
-			sliceWithElements = updateElement(sliceWithElements)
+			updateElement(stringMap)
 
 		case "delete":
-			sliceWithElements = deleteElement(sliceWithElements)
+			deleteElement(stringMap)
 
 		case "exit":
 			return
@@ -50,93 +57,74 @@ func main() {
 	}
 }
 
-func addElement(sliceWithElements []string) []string {
+func addElement(stringMap map[string]string) {
 	var newElement string
+	var keyNewElement string
 	inputType := bufio.NewScanner(os.Stdin)
 
-	fmt.Println("Write the new element")
+	fmt.Println("Write new element key")
+	fmt.Print(">>")
+	inputType.Scan()
+	keyNewElement = inputType.Text()
+
+	fmt.Println("Write new element value")
 	fmt.Print(">>")
 	inputType.Scan()
 	newElement = inputType.Text()
 
-	sliceWithElements = append(sliceWithElements, newElement)
+	stringMap[keyNewElement] = newElement
 	fmt.Println("")
-
-	return sliceWithElements
 }
 
-func updateElement(sliceWithElements []string) []string {
-	var currentElement string
+func showElement(stringMap map[string]string) {
+	var keyElement string
+
+	inputType := bufio.NewScanner(os.Stdin)
+
+	fmt.Println("Write key of element")
+	fmt.Print(">>")
+	inputType.Scan()
+	keyElement = inputType.Text()
+
+	fmt.Println("************************")
+	fmt.Println(stringMap[keyElement])
+	fmt.Println("************************")
+	fmt.Println("")
+}
+
+func updateElement(stringMap map[string]string) {
 	var newElement string
-	var notFound bool = true
+	var keyNewElement string
 
 	inputType := bufio.NewScanner(os.Stdin)
 
 	fmt.Println("Write element to replase")
 	fmt.Print(">>")
 	inputType.Scan()
-	currentElement = inputType.Text()
-	fmt.Println(currentElement)
+	keyNewElement = inputType.Text()
 
-	for i := 0; i < len(sliceWithElements) && notFound; i++ {
-		if currentElement == sliceWithElements[i] {
-			fmt.Println("Write the new element")
-			fmt.Print(">>")
-			inputType.Scan()
-			newElement = inputType.Text()
+	fmt.Println("Write new value")
+	fmt.Print(">>")
+	inputType.Scan()
+	newElement = inputType.Text()
 
-			sliceWithElements[i] = newElement
-			notFound = false
-		}
-	}
-
-	if notFound {
-		fmt.Println("Element not found")
-	}
+	stringMap[keyNewElement] = newElement
 
 	fmt.Println("")
-
-	return sliceWithElements
 }
 
-func deleteElement(sliceWithElements []string) []string {
-	var currentElement string
-	var notFound bool = true
+func deleteElement(stringMap map[string]string) {
+	var elementToDelete string
 
 	inputType := bufio.NewScanner(os.Stdin)
 
 	fmt.Println("Write element to delete")
 	fmt.Print(">>")
 	inputType.Scan()
-	currentElement = inputType.Text()
-	fmt.Println(currentElement)
+	elementToDelete = inputType.Text()
 
-	for i := 0; i < len(sliceWithElements) && notFound; i++ {
-		if currentElement == sliceWithElements[i] {
-			temp := sliceWithElements[0:i]
-			temp = append(temp, sliceWithElements[(i+1):len(sliceWithElements)]...)
-			sliceWithElements = temp
-			notFound = false
-			fmt.Println("Element deleted")
-		}
-	}
-
-	if notFound {
-		fmt.Println("Element not found")
-	}
-
+	delete(stringMap, elementToDelete)
 	fmt.Println("")
 
-	return sliceWithElements
-}
-
-func showElements(sliceWithElements []string) {
-	fmt.Println("************************")
-
-	for _, element := range sliceWithElements {
-		fmt.Println(element)
-	}
-
-	fmt.Println("************************")
 	fmt.Println("")
 }
