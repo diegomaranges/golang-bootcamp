@@ -67,12 +67,18 @@ func addElement(stringMap map[string]string) {
 	inputType.Scan()
 	keyNewElement = inputType.Text()
 
-	fmt.Println("Write new element value")
-	fmt.Print(">>")
-	inputType.Scan()
-	newElement = inputType.Text()
+	_, isUsed := stringMap[keyNewElement]
 
-	stringMap[keyNewElement] = newElement
+	if !isUsed {
+		fmt.Println("Write new element value")
+		fmt.Print(">>")
+		inputType.Scan()
+		newElement = inputType.Text()
+		stringMap[keyNewElement] = newElement
+	} else {
+		fmt.Println("Key is current used")
+	}
+
 	fmt.Println("")
 }
 
@@ -103,12 +109,17 @@ func updateElement(stringMap map[string]string) {
 	inputType.Scan()
 	keyNewElement = inputType.Text()
 
-	fmt.Println("Write new value")
-	fmt.Print(">>")
-	inputType.Scan()
-	newElement = inputType.Text()
+	_, isUsed := stringMap[keyNewElement]
 
-	stringMap[keyNewElement] = newElement
+	if isUsed {
+		fmt.Println("Write new value")
+		fmt.Print(">>")
+		inputType.Scan()
+		newElement = inputType.Text()
+		stringMap[keyNewElement] = newElement
+	} else {
+		fmt.Println("Key not found")
+	}
 
 	fmt.Println("")
 }
@@ -123,8 +134,14 @@ func deleteElement(stringMap map[string]string) {
 	inputType.Scan()
 	elementToDelete = inputType.Text()
 
-	delete(stringMap, elementToDelete)
-	fmt.Println("")
+	_, isUsed := stringMap[elementToDelete]
+
+	if isUsed {
+		delete(stringMap, elementToDelete)
+		fmt.Println("element deleted successful")
+	} else {
+		fmt.Println("element not found")
+	}
 
 	fmt.Println("")
 }
