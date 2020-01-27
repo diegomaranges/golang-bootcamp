@@ -36,15 +36,19 @@ func main() {
 		switch option {
 		case "add":
 			addElement(stringMap)
+			fmt.Println("")
 
 		case "retrive":
 			showElement(stringMap)
+			fmt.Println("")
 
 		case "update":
 			updateElement(stringMap)
+			fmt.Println("")
 
 		case "delete":
 			deleteElement(stringMap)
+			fmt.Println("")
 
 		case "exit":
 			return
@@ -57,7 +61,7 @@ func main() {
 	}
 }
 
-func addElement(stringMap map[string]string) {
+func addElement(stringMap map[string]string) int {
 	var newElement string
 	var keyNewElement string
 	inputType := bufio.NewScanner(os.Stdin)
@@ -75,14 +79,15 @@ func addElement(stringMap map[string]string) {
 		inputType.Scan()
 		newElement = inputType.Text()
 		stringMap[keyNewElement] = newElement
-	} else {
-		fmt.Println("Key is current used")
-	}
 
-	fmt.Println("")
+		return 0
+	} else {
+
+		return -1
+	}
 }
 
-func showElement(stringMap map[string]string) {
+func showElement(stringMap map[string]string) int {
 	var keyElement string
 
 	inputType := bufio.NewScanner(os.Stdin)
@@ -92,13 +97,21 @@ func showElement(stringMap map[string]string) {
 	inputType.Scan()
 	keyElement = inputType.Text()
 
-	fmt.Println("************************")
-	fmt.Println(stringMap[keyElement])
-	fmt.Println("************************")
-	fmt.Println("")
+	value, isUsed := stringMap[keyElement]
+
+	if isUsed {
+		fmt.Println("************************")
+		fmt.Println(value)
+		fmt.Println("************************")
+
+		return 0
+	} else {
+
+		return -1
+	}
 }
 
-func updateElement(stringMap map[string]string) {
+func updateElement(stringMap map[string]string) int {
 	var newElement string
 	var keyNewElement string
 
@@ -117,14 +130,16 @@ func updateElement(stringMap map[string]string) {
 		inputType.Scan()
 		newElement = inputType.Text()
 		stringMap[keyNewElement] = newElement
+
+		return 0
 	} else {
 		fmt.Println("Key not found")
-	}
 
-	fmt.Println("")
+		return -1
+	}
 }
 
-func deleteElement(stringMap map[string]string) {
+func deleteElement(stringMap map[string]string) int {
 	var elementToDelete string
 
 	inputType := bufio.NewScanner(os.Stdin)
@@ -139,9 +154,11 @@ func deleteElement(stringMap map[string]string) {
 	if isUsed {
 		delete(stringMap, elementToDelete)
 		fmt.Println("element deleted successful")
+
+		return 0
 	} else {
 		fmt.Println("element not found")
-	}
 
-	fmt.Println("")
+		return -1
+	}
 }
