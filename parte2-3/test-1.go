@@ -1,5 +1,10 @@
 package main
 
+func spam() {
+
+}
+
+/*
 func test1 {
 	cases := []struct{
 		name, function, key, value string
@@ -18,4 +23,4 @@ func test1 {
 			}
 		})
 	}
-}
+}*/
