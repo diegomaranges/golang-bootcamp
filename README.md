@@ -1,5 +1,9 @@
 # Bootcamp Golang
 
+For Run the program, go to the folder container of main file, and run make.
+If you want executable file, run make build.
+And if you have Windows OS, you can run make clean for delete file .exe genereted with make build.
+
 ## Part 2-1
 
 In this folder the file use a global Slide to save the information.
