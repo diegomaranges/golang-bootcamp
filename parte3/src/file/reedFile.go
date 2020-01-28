@@ -11,7 +11,7 @@ func UploadFile(file string) map[string]string {
 	stringMap := make(map[string]string)
 
 	elements, err := ioutil.ReadFile(file)
-	folder, err := os.OpenFile(file, os.O_APPEND|os.O_WRONLY|os.O_CREATE, os.ModeAppend)
+	folder, err := os.OpenFile(file, os.O_CREATE, os.ModePerm)
 	if err != nil {
 		panic(err)
 	}
