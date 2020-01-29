@@ -17,7 +17,7 @@ func main() {
 
 		fmt.Println("select an option:")
 		fmt.Println("add     -> for add a new element")
-		fmt.Println("retrive -> for show all elements")
+		fmt.Println("retrieve -> for show all elements")
 		fmt.Println("update  -> for replace an element")
 		fmt.Println("delete  -> for delete an element")
 		fmt.Println("exit")
@@ -31,7 +31,7 @@ func main() {
 		case "add":
 			addElement()
 
-		case "retrive":
+		case "retrieve":
 			showElements()
 
 		case "update":

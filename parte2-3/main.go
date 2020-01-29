@@ -23,7 +23,7 @@ func main() {
 
 		fmt.Println("select an option:")
 		fmt.Println("add     -> for add a new element")
-		fmt.Println("retrive -> for show all elements")
+		fmt.Println("retrieve -> for show all elements")
 		fmt.Println("update  -> for replace an element")
 		fmt.Println("delete  -> for delete an element")
 		fmt.Println("exit")
@@ -38,7 +38,7 @@ func main() {
 			addElement(stringMap)
 			fmt.Println("")
 
-		case "retrive":
+		case "retrieve":
 			showElement(stringMap)
 			fmt.Println("")
 
@@ -81,10 +81,8 @@ func addElement(stringMap map[string]string) int {
 		stringMap[keyNewElement] = newElement
 
 		return 0
-	} else {
-
-		return -1
 	}
+	return -1
 }
 
 func showElement(stringMap map[string]string) int {
@@ -105,10 +103,8 @@ func showElement(stringMap map[string]string) int {
 		fmt.Println("************************")
 
 		return 0
-	} else {
-
-		return -1
 	}
+	return -1
 }
 
 func updateElement(stringMap map[string]string) int {
@@ -132,11 +128,8 @@ func updateElement(stringMap map[string]string) int {
 		stringMap[keyNewElement] = newElement
 
 		return 0
-	} else {
-		fmt.Println("Key not found")
-
-		return -1
 	}
+	return -1
 }
 
 func deleteElement(stringMap map[string]string) int {
@@ -156,9 +149,8 @@ func deleteElement(stringMap map[string]string) int {
 		fmt.Println("element deleted successful")
 
 		return 0
-	} else {
-		fmt.Println("element not found")
-
-		return -1
 	}
+	fmt.Println("element not found")
+
+	return -1
 }
