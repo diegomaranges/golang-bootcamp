@@ -4,7 +4,8 @@ import (
 	"fmt"
 )
 
-/*Functionalitys algo*/
+/*Functionalitys All function that you can use in this interface.
+Use Init when declare an element with this interface */
 type Functionalitys interface {
 	Add(string, string) int
 	Retrieve(string) (int, string)
@@ -14,17 +15,18 @@ type Functionalitys interface {
 	PtrintMap()
 }
 
-/*Database algo*/
+/*Database Contain a map with the items in the Database */
 type Database struct {
 	mapInformation map[string]string
 }
 
-/*Init algo*/
+/*Init Run first to initilice the Database*/
 func (d *Database) Init() {
 	d.mapInformation = make(map[string]string)
 }
 
-/*Add es algo*/
+/*Add Pre: Database != nil;
+Pos: If key is existent return -1 else, return 0 and add the new item;*/
 func (d *Database) Add(keyNewElement string, newElement string) int {
 	if d.mapInformation == nil {
 		return -1
@@ -40,7 +42,8 @@ func (d *Database) Add(keyNewElement string, newElement string) int {
 	return -1
 }
 
-/*Retrieve algo*/
+/*Retrieve Pre: Database != nil;
+Pos: If key is non-existent return -1 else, return 0 and the item value;*/
 func (d *Database) Retrieve(keyElement string) (int, string) {
 	if d.mapInformation == nil {
 		return -1, ""
@@ -54,7 +57,8 @@ func (d *Database) Retrieve(keyElement string) (int, string) {
 	return 0, value
 }
 
-/*Update algo*/
+/*Update Pre: Database != nil;
+Pos: If key is non-existent return -1 else, return 0 and update&return the item value;*/
 func (d *Database) Update(keyNewElement string, newElement string) (int, string) {
 	if d.mapInformation == nil {
 		return -1, ""
@@ -71,7 +75,8 @@ func (d *Database) Update(keyNewElement string, newElement string) (int, string)
 	return 0, newElement
 }
 
-/*Delete algo*/
+/*Delete Pre: Database != nil;
+Pos: If key is non-existent return -1 else, return 0 and remove the item;*/
 func (d *Database) Delete(elementToDelete string) int {
 	if d.mapInformation == nil {
 		return -1
@@ -88,7 +93,8 @@ func (d *Database) Delete(elementToDelete string) int {
 	return 0
 }
 
-/*PtrintMap algo*/
+/*PtrintMap Pre: Database != nil;
+Pos: Show for console all items in the Database*/
 func (d *Database) PtrintMap() {
 	if d.mapInformation == nil {
 		return
