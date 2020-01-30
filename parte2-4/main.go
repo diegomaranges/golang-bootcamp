@@ -52,7 +52,10 @@ func main() {
 			inputType.Scan()
 			keyElement = inputType.Text()
 
-			myDataBase.Retrieve(keyElement)
+			fmt.Println("************************")
+			_, value := myDataBase.Retrieve(keyElement)
+			fmt.Println(value)
+			fmt.Println("************************")
 
 		case "update":
 			fmt.Println("Write element to replase")

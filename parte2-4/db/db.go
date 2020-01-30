@@ -51,10 +51,6 @@ func (d *Database) Retrieve(keyElement string) (int, string) {
 	if !isUsed {
 		return -1, ""
 	}
-
-	fmt.Println("************************")
-	fmt.Println(value)
-	fmt.Println("************************")
 	return 0, value
 }
 
