@@ -1,25 +1,26 @@
-package main
+package db
 
 import (
 	"bufio"
 	"os"
 	"testing"
+
+	"github.corp.globant.com/diego-maranges/golang-bootcamp/parte2-4/db"
 )
 
 func TestOne(t *testing.T) {
-	var myDataBase database
-	myDataBase.mapInformation = make(map[string]string)
-	myDataBase.inputType = bufio.NewScanner(os.Stdin)
+	myDataBase := new(db.Database)
+	myDataBase.Init()
 
-	result := myDataBase.add("xxx", "zzz")
+	result := myDataBase.Add("xxx", "zzz")
 	if result != 0 || len(myDataBase.mapInformation) != 1 {
 		t.Errorf("error add the first element")
 	}
-	result = myDataBase.add("xxy", "zzz")
+	result = myDataBase.Add("xxy", "zzz")
 	if result != 0 || len(myDataBase.mapInformation) != 2 {
 		t.Errorf("error add the second element")
 	}
-	result = myDataBase.add("xxx", "zzz")
+	result = myDataBase.Add("xxx", "zzz")
 	if result != -1 || len(myDataBase.mapInformation) != 2 {
 		t.Errorf("error add the thert element, result = %d \n and lengt = %d", result, len(myDataBase.mapInformation))
 	}

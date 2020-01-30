@@ -5,87 +5,22 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.corp.globant.com/diego-maranges/golang-bootcamp/parte2-4/db"
 )
-
-type functionalitys interface {
-	add(string, string) int
-	retrieve(string) (int, string)
-	update(string, string) (int, string)
-	delete(string) int
-}
-
-type database struct {
-	mapInformation map[string]string
-	inputType      *bufio.Scanner
-}
-
-func (d database) add(keyNewElement string, newElement string) int {
-	_, isUsed := d.mapInformation[keyNewElement]
-
-	if !isUsed {
-		d.mapInformation[keyNewElement] = newElement
-
-		return 0
-	}
-	return -1
-}
-
-func (d database) retrieve(keyElement string) (int, string) {
-	value, isUsed := d.mapInformation[keyElement]
-
-	if !isUsed {
-		return -1, ""
-	}
-
-	fmt.Println("************************")
-	fmt.Println(value)
-	fmt.Println("************************")
-	return 0, value
-}
-
-func (d database) update(keyNewElement string, newElement string) (int, string) {
-	_, isUsed := d.mapInformation[keyNewElement]
-
-	if !isUsed {
-		fmt.Println("Key not found")
-
-		return -1, ""
-	}
-	d.mapInformation[keyNewElement] = newElement
-	return 0, newElement
-}
-
-func (d database) delete(elementToDelete string) int {
-	_, isUsed := d.mapInformation[elementToDelete]
-	if !isUsed {
-		fmt.Println("element not found")
-
-		return -1
-	}
-	delete(d.mapInformation, elementToDelete)
-	fmt.Println("element deleted successful")
-
-	return 0
-}
 
 func main() {
 	var keyElement string
 	var newElement string
 	var keyNewElement string
 	var option string
+	inputType := bufio.NewScanner(os.Stdin)
 
-	var myDataBase database
-	myDataBase.mapInformation = make(map[string]string)
-	myDataBase.inputType = bufio.NewScanner(os.Stdin)
+	myDataBase := new(db.Database)
+	myDataBase.Init()
 
 	for {
-		fmt.Println("")
-		fmt.Println("*************************")
-		for key, value := range myDataBase.mapInformation {
-			fmt.Println(key + ": " + value)
-		}
-		fmt.Println("*************************")
-
+		myDataBase.PtrintMap()
 		fmt.Println("select an option:")
 		fmt.Println("add     -> for add a new element")
 		fmt.Println("retrieve -> for show all elements")
@@ -94,51 +29,51 @@ func main() {
 		fmt.Println("exit")
 		fmt.Print(">>")
 
-		myDataBase.inputType.Scan()
-		option = myDataBase.inputType.Text()
+		inputType.Scan()
+		option = inputType.Text()
 		option = strings.ToLower(option)
 
 		switch option {
 		case "add":
 			fmt.Println("Write new element key")
 			fmt.Print(">>")
-			myDataBase.inputType.Scan()
-			keyNewElement = myDataBase.inputType.Text()
+			inputType.Scan()
+			keyNewElement = inputType.Text()
 			fmt.Println("Write new element value")
 			fmt.Print(">>")
-			myDataBase.inputType.Scan()
-			newElement = myDataBase.inputType.Text()
+			inputType.Scan()
+			newElement = inputType.Text()
 
-			myDataBase.add(keyNewElement, newElement)
+			myDataBase.Add(keyNewElement, newElement)
 
 		case "retrieve":
 			fmt.Println("Write key of element")
 			fmt.Print(">>")
-			myDataBase.inputType.Scan()
-			keyElement = myDataBase.inputType.Text()
+			inputType.Scan()
+			keyElement = inputType.Text()
 
-			myDataBase.retrieve(keyElement)
+			myDataBase.Retrieve(keyElement)
 
 		case "update":
 			fmt.Println("Write element to replase")
 			fmt.Print(">>")
-			myDataBase.inputType.Scan()
-			keyElement = myDataBase.inputType.Text()
+			inputType.Scan()
+			keyElement = inputType.Text()
 
 			fmt.Println("Write new value")
 			fmt.Print(">>")
-			myDataBase.inputType.Scan()
-			newElement = myDataBase.inputType.Text()
+			inputType.Scan()
+			newElement = inputType.Text()
 
-			myDataBase.update(keyElement, newElement)
+			myDataBase.Update(keyElement, newElement)
 
 		case "delete":
 			fmt.Println("Write element to delete")
 			fmt.Print(">>")
-			myDataBase.inputType.Scan()
-			keyElement = myDataBase.inputType.Text()
+			inputType.Scan()
+			keyElement = inputType.Text()
 
-			myDataBase.delete(keyElement)
+			myDataBase.Delete(keyElement)
 
 		case "exit":
 			return
