@@ -27,6 +27,7 @@ func (d *DestinyFile) SetFile(destiny string) {
 }
 
 /*ReadFile reed information from file saved
+Warning: If the map element have some information it will delete
 Pre: externalMap different to nil*/
 func (d *DestinyFile) ReadFile(externalMap map[string]string) int {
 	if externalMap == nil {
@@ -45,6 +46,10 @@ func (d *DestinyFile) ReadFile(externalMap map[string]string) int {
 
 	if err != io.EOF && err != nil {
 		panic(err)
+	}
+
+	for k := range externalMap {
+		delete(externalMap, k)
 	}
 
 	sliceWithElements := strings.Split(string(fileBytes), "\n")
