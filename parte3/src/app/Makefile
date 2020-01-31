@@ -7,5 +7,8 @@ run:
 build:
 	$(CC) build $(FILE)
 
+test:
+	$(CC) test ./...
+	
 .PHONY: clean
 	rm -f *.exe
