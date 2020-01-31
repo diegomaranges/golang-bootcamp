@@ -25,7 +25,8 @@ func (d *Database) Init() {
 	d.mapInformation = make(map[string]string)
 }
 
-/*Add Pre: Database != nil;
+/*Add add item to db
+Pre: Database != nil;
 Pos: If key is existent return -1 else, return 0 and add the new item;*/
 func (d *Database) Add(keyNewElement string, newElement string) int {
 	if d.mapInformation == nil {
@@ -42,7 +43,8 @@ func (d *Database) Add(keyNewElement string, newElement string) int {
 	return -1
 }
 
-/*Retrieve Pre: Database != nil;
+/*Retrieve show item from db
+Pre: Database != nil;
 Pos: If key is non-existent return -1 else, return 0 and the item value;*/
 func (d *Database) Retrieve(keyElement string) (int, string) {
 	if d.mapInformation == nil {
@@ -57,7 +59,8 @@ func (d *Database) Retrieve(keyElement string) (int, string) {
 	return 0, value
 }
 
-/*Update Pre: Database != nil;
+/*Update rewrite item from db
+Pre: Database != nil;
 Pos: If key is non-existent return -1 else, return 0 and update&return the item value;*/
 func (d *Database) Update(keyNewElement string, newElement string) (int, string) {
 	if d.mapInformation == nil {
@@ -75,7 +78,8 @@ func (d *Database) Update(keyNewElement string, newElement string) (int, string)
 	return 0, newElement
 }
 
-/*Delete Pre: Database != nil;
+/*Delete remove element from db
+Pre: Database != nil;
 Pos: If key is non-existent return -1 else, return 0 and remove the item;*/
 func (d *Database) Delete(elementToDelete string) int {
 	if d.mapInformation == nil {
@@ -93,7 +97,8 @@ func (d *Database) Delete(elementToDelete string) int {
 	return 0
 }
 
-/*PtrintMap Pre: Database != nil;
+/*PtrintMap show db in the console
+Pre: Database != nil;
 Pos: Show for console all items in the Database*/
 func (d *Database) PtrintMap() {
 	if d.mapInformation == nil {
