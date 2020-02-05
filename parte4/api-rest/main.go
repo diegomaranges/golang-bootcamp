@@ -10,36 +10,36 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var routes = Routes {
-	Route {
+var routes = Routes{
+	Route{
 		"Index",
 		"GET",
 		"/",
-		Index
-	}
-	Route {
+		index,
+	},
+	Route{
 		"Index",
 		"GET",
 		"/car",
 		handleCar,
-	}
-	Route {
+	},
+	Route{
 		"Index",
 		"GET",
 		"/car/{id}",
 		carShow,
-	}
+	},
 }
 
 /*Route algo*/
 type Route struct {
-	Name string
-	Method string
-	Pattern string
-	HandleFunc http.HandleFunc
+	Name       string
+	Method     string
+	Pattern    string
+	HandleFunc http.HandlerFunc
 }
 
-/*Routes*/
+/*Routes algo*/
 type Routes []Route
 
 /*Car algo*/
@@ -100,14 +100,17 @@ func carShow(w http.ResponseWriter, r *http.Request) {
 	//fmt.Fprintf(w, "Has cargado la pelicula numero %s", car_id)
 }
 
+/*NewRouter algo*/
 func NewRouter() *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
-	for _, route := routes {
-		route.
+
+	for _, route := range routes {
+		router.
 			Name(route.Name).
-			Method(route.Method).
+			Methods(route.Method).
 			Path(route.Pattern).
 			Handler(route.HandleFunc)
 	}
-}
 
+	return router
+}
