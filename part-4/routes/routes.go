@@ -11,6 +11,7 @@ import (
 type Routes interface {
 	NewRouter()
 	PointerToRouter()
+	CreateNewRouter()
 }
 
 /*Router algo*/
@@ -36,13 +37,12 @@ func (r *Router) PointerToRouter() *mux.Router {
 	return r.router
 }
 
+/*CreateNewRouter algo*/
+func CreateNewRouter() *Router {
+	return new(Router)
+}
+
 /*Index algo*/
 func Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hola mundo desde mi servidor web con GO")
 }
-
-/*CreateNewRouter algo
-func CreateNewRouter() *Router {
-	var router *Router
-	return router
-}*/
