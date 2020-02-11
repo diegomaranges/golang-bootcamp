@@ -3,7 +3,7 @@ package db
 import (
 	"fmt"
 
-	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/db/fileinteraction"
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db/fileinteraction"
 )
 
 const destinyFile string = "info.txt"
