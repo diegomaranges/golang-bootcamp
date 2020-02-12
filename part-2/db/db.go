@@ -11,7 +11,7 @@ type CRUD interface {
 	Init()
 	Add(string, string) error
 	Retrieve(string) (string, error)
-	Update(string, string) (string, error)
+	Update(string, string) error
 	Delete(string) error
 	PtrintMap()
 }
@@ -68,18 +68,18 @@ func (d *Database) Retrieve(keyElement string) (string, error) {
 /*Update rewrite item from db
 Pre: Database != nil;
 Pos: If key is non-existent return -1 else, return 0 and update&return the item value;*/
-func (d *Database) Update(keyNewElement string, newElement string) (string, error) {
+func (d *Database) Update(keyNewElement string, newElement string) error {
 	if d.mapInformation == nil {
-		return "", errors.New("map is not initialized")
+		return errors.New("map is not initialized")
 	}
 
 	_, isUsed := d.mapInformation[keyNewElement]
 
 	if !isUsed {
-		return "", errors.New("Key does not exist")
+		return errors.New("Key does not exist")
 	}
 	d.mapInformation[keyNewElement] = newElement
-	return newElement, nil
+	return nil
 }
 
 /*Delete remove element from db
