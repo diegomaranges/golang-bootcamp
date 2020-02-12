@@ -16,7 +16,7 @@ func main() {
 	var option string
 	inputType := bufio.NewScanner(os.Stdin)
 
-	myDataBase := new(db.Database)
+	myDataBase := db.CreateNewDBInstance()
 	myDataBase.Init()
 
 	for {
@@ -53,7 +53,7 @@ func main() {
 			keyElement = inputType.Text()
 
 			fmt.Println("************************")
-			_, value := myDataBase.Retrieve(keyElement)
+			value, _ := myDataBase.Retrieve(keyElement)
 			fmt.Println(value)
 			fmt.Println("************************")
 
