@@ -39,7 +39,7 @@ func (r *Router) PointerToRouter() *mux.Router {
 
 /*CreateNewRouter algo*/
 func CreateNewRouter() *Router {
-	return new(Router)
+	return &Router{}
 }
 
 /*Index algo*/
