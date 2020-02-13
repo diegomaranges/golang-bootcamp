@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/db"
+	"github.corp.globant.com/diego-maranges/golang-bootcamp/part-3/db"
 )
 
 func main() {
@@ -16,7 +16,7 @@ func main() {
 	var option string
 	inputType := bufio.NewScanner(os.Stdin)
 
-	myDataBase := new(db.Database)
+	myDataBase := db.CreateNewDBInstance()
 	myDataBase.Init()
 	myDataBase.LoadFile()
 
