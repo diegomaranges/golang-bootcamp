@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.corp.globant.com/diego-maranges/golang-bootcamp/part-3/db"
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/db"
 )
 
 func main() {
