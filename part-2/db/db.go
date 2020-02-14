@@ -13,7 +13,7 @@ type CRUD interface {
 	Retrieve(string) (string, error)
 	Update(string, string) error
 	Delete(string) error
-	PtrintMap()
+	PtrintMap() error
 }
 
 /*Database Contain a map with the items in the Database */
