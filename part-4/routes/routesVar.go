@@ -1,6 +1,10 @@
 package routes
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/routes/cars"
+)
 
 type route struct {
 	name       string
@@ -16,42 +20,48 @@ var routesVar = routes{
 		"showCarsList",
 		"GET",
 		"/cars",
-		Index,
+		cars.GetListCars,
 	},
 	route{
 		"getSpecificCar",
 		"GET",
 		"/cars/{carId}",
-		Index,
+		cars.GetSpecificCar,
 	},
 	route{
 		"addNewCar",
-		"Post",
+		"POST",
 		"/cars/{carId}",
-		Index,
+		cars.CreateNewInstance,
+	},
+	route{
+		"returnListOfItem",
+		"GET",
+		"/cars/{carId}/{itemId}",
+		cars.ReturnListOfItems,
 	},
 	route{
 		"returnSpecificItemOfCar",
 		"GET",
 		"/cars/{carId}/{itemId}",
-		Index,
+		cars.ReturnAItem,
 	},
 	route{
 		"addNewItemToCar",
 		"POST",
 		"/cars/{carId}/{itemId}",
-		Index,
+		cars.AddItem,
 	},
 	route{
 		"updateElementFromACar",
 		"PUT",
 		"/cars/{carId}/{itemId}",
-		Index,
+		cars.UpdateAItem,
 	},
 	route{
 		"removeElementFromACar",
 		"DELETE",
 		"/cars/{carId}/{itemId}",
-		Index,
+		cars.DeleteAItem,
 	},
 }
