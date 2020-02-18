@@ -9,49 +9,62 @@ import (
 
 /*Database All functions used for difference between users*/
 type Database interface {
+	GetListCars(w http.ResponseWriter, r *http.Request)
+	GetSpecificCar(w http.ResponseWriter, r *http.Request)
+	AddItem(w http.ResponseWriter, r *http.Request)
+	ReturnListOfItems(w http.ResponseWriter, r *http.Request)
+	ReturnAItem(w http.ResponseWriter, r *http.Request)
+	UpdateAItem(w http.ResponseWriter, r *http.Request)
+	DeleteAItem(w http.ResponseWriter, r *http.Request)
 }
 
 /*Cars All cars from data base*/
 type Cars struct {
-	cars map[string]car.Car
+	cars map[string]*car.Car
 }
 
 /*CreateNewInstance Create New Car instance*/
-func CreateNewInstance(w http.ResponseWriter, r *http.Request) {
+func CreateNewInstance(w http.ResponseWriter, r *http.Request) *Cars {
 	fmt.Fprintf(w, "Hola mundo desde mi servidor web con GO")
+	return &Cars{}
 }
 
 /*GetListCars Create New Car instance*/
-func GetListCars(w http.ResponseWriter, r *http.Request) {
+func (c *Cars) GetListCars(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hola mundo desde mi servidor web con GO")
 }
 
 /*GetSpecificCar Create New Car instance*/
-func GetSpecificCar(w http.ResponseWriter, r *http.Request) {
+func (c *Cars) GetSpecificCar(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hola mundo desde mi servidor web con GO")
 }
 
 /*AddItem Add new item in to the car*/
-func AddItem(w http.ResponseWriter, r *http.Request) {
-	car.AddItem(w, r)
+func (c *Cars) AddItem(w http.ResponseWriter, r *http.Request) {
+	id := "1"
+	c.cars[id].AddItem(w, r)
 }
 
 /*ReturnListOfItems Return list with all elements in the car*/
-func ReturnListOfItems(w http.ResponseWriter, r *http.Request) {
-	car.ReturnListOfItems(w, r)
+func (c *Cars) ReturnListOfItems(w http.ResponseWriter, r *http.Request) {
+	id := "1"
+	c.cars[id].ReturnListOfItems(w, r)
 }
 
 /*ReturnAItem Return a single item from the car, if not exist return a error*/
-func ReturnAItem(w http.ResponseWriter, r *http.Request) {
-	car.ReturnAItem(w, r)
+func (c *Cars) ReturnAItem(w http.ResponseWriter, r *http.Request) {
+	id := "1"
+	c.cars[id].ReturnAItem(w, r)
 }
 
 /*UpdateAItem Change item from the car*/
-func UpdateAItem(w http.ResponseWriter, r *http.Request) {
-	car.UpdateAItem(w, r)
+func (c *Cars) UpdateAItem(w http.ResponseWriter, r *http.Request) {
+	id := "1"
+	c.cars[id].UpdateAItem(w, r)
 }
 
 /*DeleteAItem Delete item from the car*/
-func DeleteAItem(w http.ResponseWriter, r *http.Request) {
-	car.DeleteAItem(w, r)
+func (c *Cars) DeleteAItem(w http.ResponseWriter, r *http.Request) {
+	id := "1"
+	c.cars[id].DeleteAItem(w, r)
 }
