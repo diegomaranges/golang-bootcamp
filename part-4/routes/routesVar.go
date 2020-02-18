@@ -27,13 +27,13 @@ var routesVar = routes{
 		"GET",
 		"/cars/{carId}",
 		cars.GetSpecificCar,
-	},
-	route{
-		"addNewCar",
-		"POST",
-		"/cars/{carId}",
-		cars.CreateNewInstance,
-	},
+	}, /*
+		route{
+			"addNewCar",
+			"POST",
+			"/cars/{carId}",
+			cars.CreateNewInstance,
+		},*/
 	route{
 		"returnListOfItem",
 		"GET",
