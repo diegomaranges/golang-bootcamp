@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.corp.globant.com/diego-maranges/golang-bootcamp/part-3/db"
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/db"
 )
 
 func main() {
@@ -40,12 +40,8 @@ func main() {
 			fmt.Print(">>")
 			inputType.Scan()
 			keyNewElement = inputType.Text()
-			fmt.Println("Write new element value")
-			fmt.Print(">>")
-			inputType.Scan()
-			newElement = inputType.Text()
 
-			myDataBase.Add(keyNewElement, newElement)
+			myDataBase.Add(keyNewElement)
 
 		case "retrieve":
 			fmt.Println("Write key of element")
@@ -54,8 +50,10 @@ func main() {
 			keyElement = inputType.Text()
 
 			fmt.Println("************************")
-			_, value := myDataBase.Retrieve(keyElement)
-			fmt.Println(value)
+			value, err := myDataBase.Retrieve(keyElement)
+			if err == nil {
+				fmt.Println(value)
+			}
 			fmt.Println("************************")
 
 		case "update":

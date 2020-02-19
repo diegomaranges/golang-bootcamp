@@ -1,19 +1,25 @@
 package fileinteraction
 
 import (
+	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
-	"strings"
 )
+
+/*Items algo*/
+type Items struct {
+	Title    string `json:"title"`
+	Price    string `json:"price"`
+	Quantity int    `json:"quantity"`
+}
 
 /*FileActions have all function for handle the interecctions with files*/
 type FileActions interface {
 	SetFile(string)
-	ReadFile(map[string]string) error
-	WriteFile(map[string]string) error
+	ReadFile(map[string]*Items) error
+	WriteFile(map[string]*Items) error
 	ReturnDestinyFile() string
 }
 
@@ -22,50 +28,34 @@ type DestinyFile struct {
 	destinyFile string
 }
 
+const fileType = ".json"
+
 /*CreateNewFInstance create new instance of the object*/
 func CreateNewFInstance() *DestinyFile {
 	return &DestinyFile{}
 }
 
-/*SetFile save new route file*/
+/*SetFile save new route file without specific the type of file*/
 func (d *DestinyFile) SetFile(destiny string) {
-	d.destinyFile = destiny
+	d.destinyFile = destiny + fileType
 }
 
 /*ReadFile reed information from file saved
 Warning: If the map element have some information it will delete
 Pre: externalMap different to nil*/
-func (d *DestinyFile) ReadFile(externalMap map[string]string) error {
+func (d *DestinyFile) ReadFile(externalMap map[string]*Items) error {
 	if externalMap == nil {
 		return errors.New("map is not initialized")
 	}
 
-	file, err := os.OpenFile(d.destinyFile, os.O_CREATE|os.O_RDONLY, os.ModePerm)
-	defer file.Close()
-
-	if err != nil {
-		return err
-	}
-
-	fileBytes := make([]byte, 100)
-	_, err = file.ReadAt(fileBytes, 0)
-
+	fileBytes, err := ioutil.ReadFile(d.destinyFile)
 	if err != io.EOF && err != nil {
 		return err
 	}
 
-	for k := range externalMap {
-		delete(externalMap, k)
-	}
-
-	sliceWithElements := strings.Split(string(fileBytes), "\n")
-
-	for _, row := range sliceWithElements {
-		keyAndValue := strings.Split(row, " ")
-		fmt.Println(row)
-		if len(keyAndValue) == 2 {
-			externalMap[keyAndValue[0]] = keyAndValue[1]
-		}
+	err = json.Unmarshal(fileBytes, &externalMap)
+	if err != io.EOF && err != nil {
+		return err
 	}
 
 	return nil
@@ -73,35 +63,13 @@ func (d *DestinyFile) ReadFile(externalMap map[string]string) error {
 
 /*WriteFile write information in file saved
 Pre: externalMap different to nil*/
-func (d *DestinyFile) WriteFile(externalMap map[string]string) error {
+func (d *DestinyFile) WriteFile(externalMap map[string]*Items) error {
 	if externalMap == nil {
 		return errors.New("map is not initialized")
 	}
 
-	first := true
-	file, err := os.OpenFile(d.destinyFile, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
-	defer file.Close()
-
-	if err != nil {
-		return err
-	}
-
-	for key, value := range externalMap {
-		element := []byte(key + " " + value + "\n")
-		if first {
-			err = ioutil.WriteFile(d.destinyFile, element, 077)
-			first = false
-			if err != nil {
-				return err
-			}
-
-		} else {
-			_, err = file.WriteString(string(element))
-			if err != nil {
-				return err
-			}
-		}
-	}
+	jsonString, _ := json.Marshal(externalMap)
+	ioutil.WriteFile(d.destinyFile, jsonString, os.ModePerm)
 	return nil
 }
 

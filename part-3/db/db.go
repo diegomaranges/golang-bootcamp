@@ -4,27 +4,28 @@ import (
 	"errors"
 	"fmt"
 
-	"github.corp.globant.com/diego-maranges/golang-bootcamp/part-3/db/fileinteraction"
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/db/fileinteraction"
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/db/readapi"
 )
 
-const destinyFile string = "info.txt"
+const destinyFile string = "db"
 
 /*CRUD All function that you can use in this interface.
 Use Init when declare an element with this interface */
 type CRUD interface {
 	Init()
-	LoadFile() error
-	Add(string, string) error
-	Retrieve(string) (string, error)
+	/*LoadFile() error*/
+	Add(string) error
+	Retrieve(string) (fileinteraction.Items, error)
 	Update(string, string) error
 	Delete(string) error
-	SaveFile() error
+	/*SaveFile() error*/
 	PtrintMap() error
 }
 
 /*Database Contain a map with the items in the Database */
 type Database struct {
-	mapInformation map[string]string
+	mapInformation map[string]*fileinteraction.Items
 	file           *fileinteraction.DestinyFile
 }
 
@@ -35,7 +36,7 @@ func CreateNewDBInstance() *Database {
 
 /*Init Run first to initilice the Database*/
 func (d *Database) Init() {
-	d.mapInformation = make(map[string]string)
+	d.mapInformation = make(map[string]*fileinteraction.Items)
 	d.file = fileinteraction.CreateNewFInstance()
 	d.file.SetFile(destinyFile)
 }
@@ -54,16 +55,25 @@ func (d *Database) LoadFile() error {
 /*Add add item to db
 Pre: Database != nil;
 Pos: If key is existent return -1 else, return 0 and add the new item;*/
-func (d *Database) Add(keyNewElement string, newElement string) error {
+func (d *Database) Add(newID string) error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
 	}
-	_, isUsed := d.mapInformation[keyNewElement]
+	_, isUsed := d.mapInformation[newID]
 
 	if isUsed {
-		return errors.New("Key is already exist")
+		d.mapInformation[newID].Quantity++
+		return nil
 	}
-	d.mapInformation[keyNewElement] = newElement
+	result, err := readapi.GetElement(newID)
+	if err != nil {
+		return errors.New("element doesnt exist")
+	}
+	var myNewElement fileinteraction.Items
+	myNewElement.Price = result.Price
+	myNewElement.Title = result.Title
+	myNewElement.Quantity = 1
+	d.mapInformation[newID] = &myNewElement
 
 	return nil
 }
@@ -71,50 +81,70 @@ func (d *Database) Add(keyNewElement string, newElement string) error {
 /*Retrieve show item from db
 Pre: Database != nil;
 Pos: If key is non-existent return -1 else, return 0 and the item value;*/
-func (d *Database) Retrieve(keyElement string) (string, error) {
+func (d *Database) Retrieve(id string) (fileinteraction.Items, error) {
+	var errorCase fileinteraction.Items
+
 	if d.mapInformation == nil {
-		return "", errors.New("map is not initialized")
+		return errorCase, errors.New("map is not initialized")
 	}
 
-	value, isUsed := d.mapInformation[keyElement]
+	value, isUsed := d.mapInformation[id]
 
 	if !isUsed {
-		return "", errors.New("Key does not exist")
+
+		return errorCase, errors.New("element does not exist")
 	}
 
-	return value, nil
+	return *value, nil
 }
 
 /*Update rewrite item from db
 Pre: Database != nil;
 Pos: If key is non-existent return -1 else, return 0 and update&return the item value;*/
-func (d *Database) Update(keyNewElement string, newElement string) error {
+func (d *Database) Update(actualID string, newID string) error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
 	}
 
-	_, isUsed := d.mapInformation[keyNewElement]
-
+	_, isUsed := d.mapInformation[actualID]
 	if !isUsed {
 		return errors.New("Key does not exist")
 	}
-	d.mapInformation[keyNewElement] = newElement
+	_, isUsed = d.mapInformation[newID]
+	if isUsed {
+		return errors.New("Key does not exist")
+	}
+
+	result, err := readapi.GetElement(newID)
+	fmt.Println(err)
+	if err != nil {
+		return errors.New("new element does not exist")
+	}
+	fmt.Println(result)
+	var myNewElement fileinteraction.Items
+	myNewElement.Price = result.Price
+	myNewElement.Title = result.Title
+	myNewElement.Quantity = d.mapInformation[actualID].Quantity
+
+	d.mapInformation[newID] = &myNewElement
+	delete(d.mapInformation, actualID)
+
 	return nil
 }
 
 /*Delete remove element from db
 Pre: Database != nil;
 Pos: If key is non-existent return -1 else, return 0 and remove the item;*/
-func (d *Database) Delete(elementToDelete string) error {
+func (d *Database) Delete(id string) error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
 	}
 
-	_, isUsed := d.mapInformation[elementToDelete]
+	_, isUsed := d.mapInformation[id]
 	if !isUsed {
 		return errors.New("Key does not exist")
 	}
-	delete(d.mapInformation, elementToDelete)
+	delete(d.mapInformation, id)
 
 	return nil
 }
@@ -140,8 +170,9 @@ func (d *Database) PtrintMap() error {
 
 	fmt.Println("")
 	fmt.Println("*************************")
-	for key, value := range d.mapInformation {
-		fmt.Println(key + ": " + value)
+	for k, v := range d.mapInformation {
+		fmt.Print(k + ": ")
+		fmt.Println(*v)
 	}
 	fmt.Println("*************************")
 	return nil
