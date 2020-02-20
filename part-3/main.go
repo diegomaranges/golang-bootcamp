@@ -17,7 +17,6 @@ func main() {
 	inputType := bufio.NewScanner(os.Stdin)
 
 	myDataBase := db.CreateNewDBInstance()
-	myDataBase.Init()
 	myDataBase.LoadFile()
 
 	for {

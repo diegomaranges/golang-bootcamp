@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/db/fileinteraction"
 	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/db/readapi"
@@ -13,13 +14,12 @@ const destinyFile string = "db"
 /*CRUD All function that you can use in this interface.
 Use Init when declare an element with this interface */
 type CRUD interface {
-	Init()
-	/*LoadFile() error*/
+	LoadFile() error
 	Add(string) error
 	Retrieve(string) (fileinteraction.Items, error)
 	Update(string, string) error
 	Delete(string) error
-	/*SaveFile() error*/
+	SaveFile() error
 	PtrintMap() error
 }
 
@@ -27,18 +27,17 @@ type CRUD interface {
 type Database struct {
 	mapInformation map[string]*fileinteraction.Items
 	file           *fileinteraction.DestinyFile
+	mux            *sync.Mutex
 }
 
 /*CreateNewDBInstance create new instance of the object*/
 func CreateNewDBInstance() *Database {
-	return &Database{}
-}
-
-/*Init Run first to initilice the Database*/
-func (d *Database) Init() {
-	d.mapInformation = make(map[string]*fileinteraction.Items)
-	d.file = fileinteraction.CreateNewFInstance()
-	d.file.SetFile(destinyFile)
+	dataBase := &Database{}
+	dataBase.mapInformation = make(map[string]*fileinteraction.Items)
+	dataBase.file = fileinteraction.CreateNewFInstance()
+	dataBase.file.SetFile(destinyFile)
+	dataBase.mux = &sync.Mutex{}
+	return dataBase
 }
 
 /*LoadFile load file and save information in the db if have a correct syntax
@@ -48,6 +47,8 @@ func (d *Database) LoadFile() error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
 	}
+	d.mux.Lock()
+	defer d.mux.Unlock()
 
 	return d.file.ReadFile(d.mapInformation)
 }
@@ -59,6 +60,9 @@ func (d *Database) Add(newID string) error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
 	}
+	d.mux.Lock()
+	defer d.mux.Unlock()
+
 	_, isUsed := d.mapInformation[newID]
 
 	if isUsed {
@@ -69,6 +73,7 @@ func (d *Database) Add(newID string) error {
 	if err != nil {
 		return errors.New("element doesnt exist")
 	}
+
 	var myNewElement fileinteraction.Items
 	myNewElement.Price = result.Price
 	myNewElement.Title = result.Title
@@ -88,6 +93,8 @@ func (d *Database) Retrieve(id string) (fileinteraction.Items, error) {
 		return errorCase, errors.New("map is not initialized")
 	}
 
+	d.mux.Lock()
+	defer d.mux.Unlock()
 	value, isUsed := d.mapInformation[id]
 
 	if !isUsed {
@@ -105,6 +112,8 @@ func (d *Database) Update(actualID string, newID string) error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
 	}
+	d.mux.Lock()
+	defer d.mux.Unlock()
 
 	_, isUsed := d.mapInformation[actualID]
 	if !isUsed {
@@ -120,7 +129,7 @@ func (d *Database) Update(actualID string, newID string) error {
 	if err != nil {
 		return errors.New("new element does not exist")
 	}
-	fmt.Println(result)
+
 	var myNewElement fileinteraction.Items
 	myNewElement.Price = result.Price
 	myNewElement.Title = result.Title
@@ -139,6 +148,8 @@ func (d *Database) Delete(id string) error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
 	}
+	d.mux.Lock()
+	defer d.mux.Unlock()
 
 	_, isUsed := d.mapInformation[id]
 	if !isUsed {
@@ -156,6 +167,8 @@ func (d *Database) SaveFile() error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
 	}
+	d.mux.Lock()
+	defer d.mux.Unlock()
 
 	return d.file.WriteFile(d.mapInformation)
 }
@@ -167,6 +180,8 @@ func (d *Database) PtrintMap() error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
 	}
+	d.mux.Lock()
+	defer d.mux.Unlock()
 
 	fmt.Println("")
 	fmt.Println("*************************")

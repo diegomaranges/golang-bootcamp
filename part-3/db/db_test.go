@@ -8,7 +8,6 @@ import (
 
 func TestOne(t *testing.T) {
 	myDataBase := CreateNewDBInstance()
-	myDataBase.Init()
 
 	err := myDataBase.Add("1")
 	assert.Equal(t, len(myDataBase.mapInformation), 1, "error add the first element")
@@ -26,7 +25,6 @@ func TestOne(t *testing.T) {
 
 func TestTwo(t *testing.T) {
 	myDataBase := CreateNewDBInstance()
-	myDataBase.Init()
 
 	/*add 9 items*/
 	err := myDataBase.Add("1")
