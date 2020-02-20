@@ -6,7 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-/*Run this test without file existent*/
 func TestOne(t *testing.T) {
 	file := CreateNewFInstance()
 	var mapExample map[string]*Items
