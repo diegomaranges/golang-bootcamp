@@ -20,7 +20,8 @@ func ReturnCar(w http.ResponseWriter, r *http.Request) {
 	dataBase.LoadFile()
 	carMap, err := dataBase.ReturnMap()
 	if err != nil {
-		response(w, http.StatusConflict, nil)
+		response(w, http.StatusConflict, carMap)
+		return
 	}
 	response(w, http.StatusOK, carMap)
 }
@@ -32,7 +33,8 @@ func ReturnItem(w http.ResponseWriter, r *http.Request) {
 	itemID := mux.Vars(r)["itemID"]
 	item, err := dataBase.Retrieve(itemID)
 	if err != nil {
-		response(w, http.StatusNotFound, nil)
+		response(w, http.StatusNotFound, item)
+		return
 	}
 	response(w, http.StatusOK, item)
 }
@@ -45,10 +47,12 @@ func AddItem(w http.ResponseWriter, r *http.Request) {
 	err := dataBase.Add(itemID)
 	if err != nil {
 		response(w, http.StatusConflict, nil)
+		return
 	}
 	err = dataBase.SaveFile()
 	if err != nil {
 		response(w, http.StatusConflict, nil)
+		return
 	}
 	jsonString, _ := json.Marshal("Item Added")
 	response(w, http.StatusOK, jsonString)
