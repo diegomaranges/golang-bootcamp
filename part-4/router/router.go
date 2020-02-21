@@ -52,8 +52,8 @@ func generateARoutes() []route {
 
 }
 
-/*NewRute create a new router*/
-func NewRute() *mux.Router {
+/*NewRoute create a new router*/
+func NewRoute() *mux.Router {
 	newRoute := mux.NewRouter().StrictSlash(true)
 
 	for _, route := range generateARoutes() {
