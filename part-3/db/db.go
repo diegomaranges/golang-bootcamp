@@ -2,7 +2,6 @@ package db
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 
 	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/db/fileinteraction"
@@ -137,7 +136,6 @@ func (d *Database) Update(actualID string, newID string) error {
 	}
 
 	result, err := readapi.GetElement(newID)
-	fmt.Println(err)
 	if err != nil {
 		return errors.New("new element does not exist")
 	}

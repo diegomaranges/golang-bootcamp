@@ -19,22 +19,34 @@ type routes []route
 func generateARoutes() []route {
 	return routes{
 		route{
-			"showCarsList",
+			"getSpecificCar",
 			http.MethodGet,
 			"/cars/{carID}",
 			apifunctions.ReturnCar,
 		},
 		route{
-			"getSpecificCar",
+			"getSpecificItem",
 			http.MethodGet,
 			"/cars/{carID}/{itemID}",
 			apifunctions.ReturnItem,
 		},
 		route{
-			"addNewCar",
+			"addItem",
 			http.MethodPost,
 			"/cars/{carID}/{itemID}",
 			apifunctions.AddItem,
+		},
+		route{
+			"updateItem",
+			http.MethodPut,
+			"/cars/{carID}/{itemID}",
+			apifunctions.UpdateItem,
+		},
+		route{
+			"deleteItem",
+			http.MethodDelete,
+			"/cars/{carID}/{itemID}",
+			apifunctions.DeleteItem,
 		},
 	}
 
