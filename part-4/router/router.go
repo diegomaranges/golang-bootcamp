@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/router/apifunctions"
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/router/apifunctions"
 )
 
 type route struct {

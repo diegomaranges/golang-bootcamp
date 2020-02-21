@@ -4,8 +4,8 @@ import (
 	"errors"
 	"sync"
 
-	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/db/fileinteraction"
-	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/db/readapi"
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db/fileinteraction"
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db/readapi"
 )
 
 const destinyFile string = "db"

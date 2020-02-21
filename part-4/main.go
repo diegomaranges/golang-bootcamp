@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/router"
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/router"
 )
 
 func main() {

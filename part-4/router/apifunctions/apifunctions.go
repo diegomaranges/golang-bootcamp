@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/db"
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db"
 )
 
 /*Item algo*/
