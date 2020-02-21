@@ -35,7 +35,7 @@ func CreateNewFInstance() *DestinyFile {
 	return &DestinyFile{}
 }
 
-/*SetFile save new route file without specific the type of file*/
+/*SetFile save new route file without specific the type*/
 func (d *DestinyFile) SetFile(destiny string) {
 	d.destinyFile = destiny + fileType
 }

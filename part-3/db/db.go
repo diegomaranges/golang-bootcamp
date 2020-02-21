@@ -16,11 +16,11 @@ Use Init when declare an element with this interface */
 type CRUD interface {
 	LoadFile() error
 	Add(string) error
+	ReturnMap() (map[string]*fileinteraction.Items, error)
 	Retrieve(string) (fileinteraction.Items, error)
 	Update(string, string) error
 	Delete(string) error
 	SaveFile() error
-	PtrintMap() error
 }
 
 /*Database Contain a map with the items in the Database */
@@ -105,6 +105,18 @@ func (d *Database) Retrieve(id string) (fileinteraction.Items, error) {
 	return *value, nil
 }
 
+/*ReturnMap show db in the console
+Pre: Database != nil;
+Pos: Show for console all items in the Database*/
+func (d *Database) ReturnMap() (map[string]*fileinteraction.Items, error) {
+	if d.mapInformation == nil {
+		return nil, errors.New("map is not initialized")
+	}
+	d.mux.Lock()
+	defer d.mux.Unlock()
+	return d.mapInformation, nil
+}
+
 /*Update rewrite item from db
 Pre: Database != nil;
 Pos: If key is non-existent return -1 else, return 0 and update&return the item value;*/
@@ -171,24 +183,4 @@ func (d *Database) SaveFile() error {
 	defer d.mux.Unlock()
 
 	return d.file.WriteFile(d.mapInformation)
-}
-
-/*PtrintMap show db in the console
-Pre: Database != nil;
-Pos: Show for console all items in the Database*/
-func (d *Database) PtrintMap() error {
-	if d.mapInformation == nil {
-		return errors.New("map is not initialized")
-	}
-	d.mux.Lock()
-	defer d.mux.Unlock()
-
-	fmt.Println("")
-	fmt.Println("*************************")
-	for k, v := range d.mapInformation {
-		fmt.Print(k + ": ")
-		fmt.Println(*v)
-	}
-	fmt.Println("*************************")
-	return nil
 }
