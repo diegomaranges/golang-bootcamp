@@ -61,7 +61,7 @@ func (d *Database) Retrieve(keyElement string) (string, error) {
 
 /*Update rewrite item from db
 Pre: Database != nil;
-Pos: If key is non-existent return -1 else, return 0 and update&return the item value;*/
+Pos: If key is non-existent return -1 else, return 0 and update*/
 func (d *Database) Update(keyNewElement string, newElement string) error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
