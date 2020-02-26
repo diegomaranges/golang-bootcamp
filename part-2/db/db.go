@@ -8,7 +8,6 @@ import (
 /*CRUD All function that you can use in this interface.
 Use Init when declare an element with this interface */
 type CRUD interface {
-	Init()
 	Add(string, string) error
 	Retrieve(string) (string, error)
 	Update(string, string) error
@@ -23,12 +22,9 @@ type Database struct {
 
 /*CreateNewDBInstance create new instance of the object*/
 func CreateNewDBInstance() *Database {
-	return &Database{}
-}
-
-/*Init Run first to initilice the Database*/
-func (d *Database) Init() {
-	d.mapInformation = make(map[string]string)
+	newDB := &Database{}
+	newDB.mapInformation = make(map[string]string)
+	return newDB
 }
 
 /*Add add item to db
@@ -38,9 +34,8 @@ func (d *Database) Add(keyNewElement string, newElement string) error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
 	}
-	_, isUsed := d.mapInformation[keyNewElement]
 
-	if isUsed {
+	if _, isUsed := d.mapInformation[keyNewElement]; isUsed {
 		return errors.New("Key is already exist")
 	}
 	d.mapInformation[keyNewElement] = newElement
@@ -61,7 +56,6 @@ func (d *Database) Retrieve(keyElement string) (string, error) {
 	if !isUsed {
 		return "", errors.New("Key does not exist")
 	}
-
 	return value, nil
 }
 
@@ -73,9 +67,7 @@ func (d *Database) Update(keyNewElement string, newElement string) error {
 		return errors.New("map is not initialized")
 	}
 
-	_, isUsed := d.mapInformation[keyNewElement]
-
-	if !isUsed {
+	if _, isUsed := d.mapInformation[keyNewElement]; !isUsed {
 		return errors.New("Key does not exist")
 	}
 	d.mapInformation[keyNewElement] = newElement
@@ -90,8 +82,7 @@ func (d *Database) Delete(elementToDelete string) error {
 		return errors.New("map is not initialized")
 	}
 
-	_, isUsed := d.mapInformation[elementToDelete]
-	if !isUsed {
+	if _, isUsed := d.mapInformation[elementToDelete]; !isUsed {
 		return errors.New("Key does not exist")
 	}
 	delete(d.mapInformation, elementToDelete)

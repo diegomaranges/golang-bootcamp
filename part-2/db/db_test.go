@@ -6,9 +6,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestAdd(t *testing.T) {
+	myDataBase := new(Database)
+
+	err := myDataBase.Add("xxx", "zzz")
+	assert.Equal(t, len(myDataBase.mapInformation), 1, "error add the first element")
+	assert.Error(t, err, "error add the first element")
+
+	err = myDataBase.Add("xxy", "zzz")
+	assert.Equal(t, len(myDataBase.mapInformation), 2, "error add the second element")
+	assert.NoError(t, err, "error add the second element")
+
+	err = myDataBase.Add("xxx", "zzz")
+	assert.Equal(t, len(myDataBase.mapInformation), 2, "error add the third element")
+	assert.Error(t, err, "error add the third element")
+}
+
 func TestOne(t *testing.T) {
 	myDataBase := new(Database)
-	myDataBase.Init()
 
 	err := myDataBase.Add("xxx", "zzz")
 	assert.Equal(t, len(myDataBase.mapInformation), 1, "error add the first element")
@@ -25,7 +40,6 @@ func TestOne(t *testing.T) {
 
 func TestTwo(t *testing.T) {
 	myDataBase := CreateNewDBInstance()
-	myDataBase.Init()
 
 	/*add 9 items*/
 	err := myDataBase.Add("xxx", "zzz")

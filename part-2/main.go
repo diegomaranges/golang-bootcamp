@@ -17,7 +17,6 @@ func main() {
 	inputType := bufio.NewScanner(os.Stdin)
 
 	myDataBase := db.CreateNewDBInstance()
-	myDataBase.Init()
 
 	for {
 		myDataBase.PtrintMap()
@@ -44,7 +43,9 @@ func main() {
 			inputType.Scan()
 			newElement = inputType.Text()
 
-			myDataBase.Add(keyNewElement, newElement)
+			if err := myDataBase.Add(keyNewElement, newElement); err != nil {
+				fmt.Println(err)
+			}
 
 		case "retrieve":
 			fmt.Println("Write key of element")
@@ -53,8 +54,12 @@ func main() {
 			keyElement = inputType.Text()
 
 			fmt.Println("************************")
-			value, _ := myDataBase.Retrieve(keyElement)
-			fmt.Println(value)
+			value, err := myDataBase.Retrieve(keyElement)
+			if err != nil {
+				fmt.Println(err)
+			} else {
+				fmt.Println(value)
+			}
 			fmt.Println("************************")
 
 		case "update":
@@ -68,7 +73,9 @@ func main() {
 			inputType.Scan()
 			newElement = inputType.Text()
 
-			myDataBase.Update(keyElement, newElement)
+			if err := myDataBase.Update(keyElement, newElement); err != nil {
+				fmt.Println(err)
+			}
 
 		case "delete":
 			fmt.Println("Write element to delete")
@@ -76,7 +83,9 @@ func main() {
 			inputType.Scan()
 			keyElement = inputType.Text()
 
-			myDataBase.Delete(keyElement)
+			if err := myDataBase.Delete(keyElement); err != nil {
+				fmt.Println(err)
+			}
 
 		case "exit":
 			return
