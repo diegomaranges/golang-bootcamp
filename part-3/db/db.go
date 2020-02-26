@@ -4,15 +4,12 @@ import (
 	"errors"
 	"fmt"
 
-	"github.corp.globant.com/diego-maranges/golang-bootcamp/part-3/db/fileinteraction"
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-3/db/fileinteraction"
 )
-
-const destinyFile string = "info.txt"
 
 /*CRUD All function that you can use in this interface.
 Use Init when declare an element with this interface */
 type CRUD interface {
-	Init()
 	LoadFile() error
 	Add(string, string) error
 	Retrieve(string) (string, error)
@@ -29,15 +26,12 @@ type Database struct {
 }
 
 /*CreateNewDBInstance create new instance of the object*/
-func CreateNewDBInstance() *Database {
-	return &Database{}
-}
-
-/*Init Run first to initilice the Database*/
-func (d *Database) Init() {
-	d.mapInformation = make(map[string]string)
-	d.file = fileinteraction.CreateNewFInstance()
-	d.file.SetFile(destinyFile)
+func CreateNewDBInstance(destinyFile string) *Database {
+	newDB := &Database{}
+	newDB.mapInformation = make(map[string]string)
+	newDB.file = fileinteraction.CreateNewFInstance()
+	newDB.file.SetFile(destinyFile)
+	return newDB
 }
 
 /*LoadFile load file and save information in the db if have a correct syntax
@@ -58,9 +52,8 @@ func (d *Database) Add(keyNewElement string, newElement string) error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
 	}
-	_, isUsed := d.mapInformation[keyNewElement]
 
-	if isUsed {
+	if _, isUsed := d.mapInformation[keyNewElement]; isUsed {
 		return errors.New("Key is already exist")
 	}
 	d.mapInformation[keyNewElement] = newElement
@@ -76,13 +69,11 @@ func (d *Database) Retrieve(keyElement string) (string, error) {
 		return "", errors.New("map is not initialized")
 	}
 
-	value, isUsed := d.mapInformation[keyElement]
-
-	if !isUsed {
+	if _, isUsed := d.mapInformation[keyElement]; !isUsed {
 		return "", errors.New("Key does not exist")
 	}
 
-	return value, nil
+	return d.mapInformation[keyElement], nil
 }
 
 /*Update rewrite item from db
@@ -93,11 +84,10 @@ func (d *Database) Update(keyNewElement string, newElement string) error {
 		return errors.New("map is not initialized")
 	}
 
-	_, isUsed := d.mapInformation[keyNewElement]
-
-	if !isUsed {
+	if _, isUsed := d.mapInformation[keyNewElement]; !isUsed {
 		return errors.New("Key does not exist")
 	}
+
 	d.mapInformation[keyNewElement] = newElement
 	return nil
 }
@@ -110,8 +100,7 @@ func (d *Database) Delete(elementToDelete string) error {
 		return errors.New("map is not initialized")
 	}
 
-	_, isUsed := d.mapInformation[elementToDelete]
-	if !isUsed {
+	if _, isUsed := d.mapInformation[elementToDelete]; !isUsed {
 		return errors.New("Key does not exist")
 	}
 	delete(d.mapInformation, elementToDelete)

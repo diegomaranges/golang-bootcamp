@@ -2,7 +2,6 @@ package fileinteraction
 
 import (
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -54,15 +53,13 @@ func (d *DestinyFile) ReadFile(externalMap map[string]string) error {
 		return err
 	}
 
-	for k := range externalMap {
-		delete(externalMap, k)
-	}
+	externalMap = make(map[string]string)
 
 	sliceWithElements := strings.Split(string(fileBytes), "\n")
 
 	for _, row := range sliceWithElements {
 		keyAndValue := strings.Split(row, " ")
-		fmt.Println(row)
+
 		if len(keyAndValue) == 2 {
 			externalMap[keyAndValue[0]] = keyAndValue[1]
 		}
