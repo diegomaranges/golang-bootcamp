@@ -3,7 +3,6 @@ package fileinteraction
 import (
 	"encoding/json"
 	"errors"
-	"io"
 	"io/ioutil"
 	"os"
 )
@@ -49,12 +48,11 @@ func (d *DestinyFile) ReadFile(externalMap map[string]*Items) error {
 	}
 
 	fileBytes, err := ioutil.ReadFile(d.destinyFile)
-	if err != io.EOF && err != nil {
+	if err != nil {
 		return err
 	}
 
-	err = json.Unmarshal(fileBytes, &externalMap)
-	if err != io.EOF && err != nil {
+	if err := json.Unmarshal(fileBytes, &externalMap); err != nil {
 		return err
 	}
 
@@ -68,7 +66,11 @@ func (d *DestinyFile) WriteFile(externalMap map[string]*Items) error {
 		return errors.New("map is not initialized")
 	}
 
-	jsonString, _ := json.Marshal(externalMap)
+	jsonString, err := json.Marshal(externalMap)
+	if err != nil {
+		return err
+	}
+
 	ioutil.WriteFile(d.destinyFile, jsonString, os.ModePerm)
 	return nil
 }

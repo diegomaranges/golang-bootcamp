@@ -1,128 +1,114 @@
 package db
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOne(t *testing.T) {
+func TestAdd(t *testing.T) {
 	myDataBase := CreateNewDBInstance()
 
-	err := myDataBase.Add("1")
-	assert.Equal(t, len(myDataBase.mapInformation), 1, "error add the first element")
-	assert.NoError(t, err, "error add the first element")
+	tables := []struct {
+		key           string
+		value         string
+		expectedValue string
+		length        int
+		err           error
+		element       string
+	}{
+		{"1", "1", "1", 1, nil, "first"},
+		{"2", "2", "2", 2, nil, "second"},
+		{"2", "5", "2", 2, errors.New("Key is already exist"), "second"},
+		{"3", "3", "3", 3, nil, "third"},
+		{"4", "4", "4", 4, nil, "fourth"},
+	}
 
-	err = myDataBase.Add("2")
-	assert.Equal(t, len(myDataBase.mapInformation), 2, "error add the second element")
-	assert.NoError(t, err, "error add the second element")
-
-	err = myDataBase.Add("1")
-	assert.Equal(t, len(myDataBase.mapInformation), 2, "error add the third element")
-	assert.Equal(t, myDataBase.mapInformation["1"].Quantity, 2, "error trying to add a same item")
-	assert.NoError(t, err, "error add the third element")
+	for _, table := range tables {
+		err := myDataBase.Add(table.key)
+		assert.Equal(t, table.length, len(myDataBase.mapInformation), "error: element was not added", table.element)
+		assert.Equal(t, table.err, err, "error: element added error", table.element)
+		assert.Equal(t, table.expectedValue, myDataBase.mapInformation[table.key], "error: element add a wrong value")
+	}
 }
 
-func TestTwo(t *testing.T) {
+func TestRetrieve(t *testing.T) {
 	myDataBase := CreateNewDBInstance()
 
-	/*add 9 items*/
-	err := myDataBase.Add("1")
-	assert.Equal(t, len(myDataBase.mapInformation), 1, "error trying to add an item (1)")
-	assert.NoError(t, err, "error trying to add an item (1)")
+	tables := []struct {
+		key     string
+		value   string
+		length  int
+		err     error
+		element string
+	}{
+		{"1", "1", 5, nil, "first"},
+		{"2", "2", 5, nil, "second"},
+		{"3", "3", 5, nil, "third"},
+		{"4", "4", 5, nil, "fourth"},
+		{"124", "34", 5, nil, "fifth"},
+		{"125", "", 5, errors.New("Key does not exist"), "fifth"},
+	}
 
-	err = myDataBase.Add("2")
-	assert.Equal(t, len(myDataBase.mapInformation), 2, "error trying to add an item (2)")
-	assert.NoError(t, err, "error trying to add an item (2)")
+	for _, table := range tables {
+		value, err := myDataBase.Retrieve(table.key)
+		assert.Equal(t, table.value, value, "error: do not retrieve a correct value", table.element)
+		assert.Equal(t, table.length, len(myDataBase.mapInformation), "error: retrieve edit the map", table.element)
+		assert.Equal(t, table.err, err, "error: do not retrieved", table.element)
+	}
+}
 
-	err = myDataBase.Add("3")
-	assert.Equal(t, len(myDataBase.mapInformation), 3, "error trying to add an item (3)")
-	assert.NoError(t, err, "error trying to add an item (3)")
+func TestUpdate(t *testing.T) {
+	myDataBase := CreateNewDBInstance()
 
-	err = myDataBase.Add("4")
-	assert.Equal(t, len(myDataBase.mapInformation), 4, "error trying to add an item (4)")
-	assert.NoError(t, err, "error trying to add an item (4)")
+	tables := []struct {
+		key      string
+		newValue string
+		isUsed   bool
+		length   int
+		err      error
+		element  string
+	}{
+		{"1", "5", true, 5, nil, "1"},
+		{"2", "6", true, 5, nil, "2"},
+		{"3", "7", true, 5, nil, "3"},
+		{"4", "8", true, 5, nil, "4"},
+		{"124", "9", true, 5, nil, "5"},
+		{"125", "", false, 5, errors.New("Key does not exist"), "6"},
+	}
 
-	err = myDataBase.Add("5")
-	assert.Equal(t, len(myDataBase.mapInformation), 5, "error trying to add an item (5)")
-	assert.NoError(t, err, "error trying to add an item (5)")
+	for _, table := range tables {
+		err := myDataBase.Update(table.key, table.newValue)
+		assert.Equal(t, table.length, len(myDataBase.mapInformation), "error: update element edit size of map", table.element)
+		assert.Equal(t, table.err, err, "error: element was not updated", table.element)
+		value, isUsed := myDataBase.mapInformation[table.key]
+		assert.Equal(t, table.isUsed, isUsed, "error: element was not updated correctly", table.element)
+		if table.isUsed {
+			assert.Equal(t, table.newValue, value, "error: value changed when update the element", table.element)
+		}
+	}
+}
 
-	err = myDataBase.Add("6")
-	assert.Equal(t, len(myDataBase.mapInformation), 6, "error trying to add an item (6)")
-	assert.NoError(t, err, "error trying to add an item (6)")
+func TestDelete(t *testing.T) {
+	myDataBase := CreateNewDBInstance()
 
-	err = myDataBase.Add("7")
-	assert.Equal(t, len(myDataBase.mapInformation), 7, "error trying to add an item (7)")
-	assert.NoError(t, err, "error trying to add an item (7)")
+	tables := []struct {
+		key     string
+		length  int
+		err     error
+		element string
+	}{
+		{"1", 4, nil, "first"},
+		{"2", 3, nil, "second"},
+		{"3", 2, nil, "third"},
+		{"4", 1, nil, "fourth"},
+		{"125", 1, errors.New("Key does not exist"), "fifth"},
+	}
 
-	err = myDataBase.Add("8")
-	assert.Equal(t, len(myDataBase.mapInformation), 8, "error trying to add an item (8)")
-	assert.NoError(t, err, "error trying to add an item (8)")
-
-	err = myDataBase.Add("9")
-	assert.Equal(t, len(myDataBase.mapInformation), 9, "error trying to add an item (9)")
-	assert.NoError(t, err, "error trying to add an item (9)")
-
-	/*try to add item with existing key*/
-	err = myDataBase.Add("5")
-	assert.Equal(t, len(myDataBase.mapInformation), 9, "error trying to add a same item")
-	assert.Equal(t, myDataBase.mapInformation["5"].Quantity, 2, "error trying to add a same item")
-	assert.NoError(t, err, "error trying to add a same item")
-
-	/*retrive 3 items, the first and last to add, and one more in the middle*/
-	tempString, err := myDataBase.Retrieve("1")
-	assert.Equalf(t, len(myDataBase.mapInformation), 9, "error to retrive an item, lengt = %d", len(myDataBase.mapInformation))
-	assert.Equal(t, tempString.Title, "Bannana", "error to retrive an item")
-	assert.NoError(t, err, "error to retrive an item")
-
-	tempString, err = myDataBase.Retrieve("6")
-	assert.Equalf(t, len(myDataBase.mapInformation), 9, "error to retrive an item, lengt = %d", len(myDataBase.mapInformation))
-	assert.Equal(t, tempString.Title, "Water", "error to retrive an item")
-	assert.NoError(t, err, "error to retrive an item")
-
-	tempString, err = myDataBase.Retrieve("9")
-	assert.Equalf(t, len(myDataBase.mapInformation), 9, "error to retrive an item, lengt = %d", len(myDataBase.mapInformation))
-	assert.Equal(t, tempString.Title, "Bread", "error to retrive an item")
-	assert.NoError(t, err, "error to retrive an item")
-
-	/*update a item*/
-	err = myDataBase.Update("3", "12")
-	assert.Equalf(t, len(myDataBase.mapInformation), 9, "error trying to update an existent item")
-	assert.NoError(t, err, "error trying to update an existent item")
-
-	/*try to update a non-existent item*/
-	err = myDataBase.Update("4", "13")
-	assert.Equalf(t, len(myDataBase.mapInformation), 9, "error trying to update an non-existent item")
-	assert.Error(t, err, "error trying to update an non-existent item")
-
-	err = myDataBase.Update("10", "3")
-	assert.Equalf(t, len(myDataBase.mapInformation), 9, "error trying to update an non-existent item")
-	assert.Error(t, err, "error trying to update an non-existent item")
-
-	err = myDataBase.Update("10", "13")
-	assert.Equalf(t, len(myDataBase.mapInformation), 9, "error trying to update an non-existent item")
-	assert.Error(t, err, "error trying to update an non-existent item")
-
-	/*delete 3 items,  the first and last to add, and one more in the middle*/
-	err = myDataBase.Delete("1")
-	assert.Equalf(t, len(myDataBase.mapInformation), 8, "error trying to remove the first item")
-	assert.NoError(t, err, "error trying to remove the first item")
-
-	err = myDataBase.Delete("5")
-	assert.Equalf(t, len(myDataBase.mapInformation), 7, "error trying to remove an middle item")
-	assert.NoError(t, err, "error trying to remove an middle item")
-
-	err = myDataBase.Delete("9")
-	assert.Equalf(t, len(myDataBase.mapInformation), 6, "error trying to remove the last item")
-	assert.NoError(t, err, "error trying to remove the last item")
-
-	/*try delete a non-existent item*/
-	err = myDataBase.Delete("14")
-	assert.Equalf(t, len(myDataBase.mapInformation), 6, "error trying to remove a non-existent item")
-	assert.Error(t, err, "error trying to remove a non-existent item")
-
-	err = myDataBase.Delete("9")
-	assert.Equalf(t, len(myDataBase.mapInformation), 6, "error trying to remove a non-existent item")
-	assert.Error(t, err, "error trying to remove a non-existent item")
-
+	for _, table := range tables {
+		err := myDataBase.Delete(table.key)
+		assert.Equal(t, table.length, len(myDataBase.mapInformation), "error: element was not deleted", table.element)
+		assert.Equal(t, table.err, err, "error: element deleted error", table.element)
+	}
 }

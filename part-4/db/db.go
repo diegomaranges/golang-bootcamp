@@ -62,12 +62,11 @@ func (d *Database) Add(newID string) error {
 	d.mux.Lock()
 	defer d.mux.Unlock()
 
-	_, isUsed := d.mapInformation[newID]
-
-	if isUsed {
+	if _, isUsed := d.mapInformation[newID]; isUsed {
 		d.mapInformation[newID].Quantity++
 		return nil
 	}
+
 	result, err := readapi.GetElement(newID)
 	if err != nil {
 		return errors.New("element doesnt exist")
@@ -94,14 +93,11 @@ func (d *Database) Retrieve(id string) (fileinteraction.Items, error) {
 
 	d.mux.Lock()
 	defer d.mux.Unlock()
-	value, isUsed := d.mapInformation[id]
-
-	if !isUsed {
-
+	if _, isUsed := d.mapInformation[id]; !isUsed {
 		return errorCase, errors.New("element does not exist")
 	}
 
-	return *value, nil
+	return *d.mapInformation[id], nil
 }
 
 /*ReturnMap show db in the console
@@ -111,8 +107,7 @@ func (d *Database) ReturnMap() (map[string]*fileinteraction.Items, error) {
 	if d.mapInformation == nil {
 		return nil, errors.New("map is not initialized")
 	}
-	d.mux.Lock()
-	defer d.mux.Unlock()
+
 	return d.mapInformation, nil
 }
 
@@ -126,12 +121,10 @@ func (d *Database) Update(actualID string, newID string) error {
 	d.mux.Lock()
 	defer d.mux.Unlock()
 
-	_, isUsed := d.mapInformation[actualID]
-	if !isUsed {
+	if _, isUsed := d.mapInformation[actualID]; !isUsed {
 		return errors.New("Key does not exist")
 	}
-	_, isUsed = d.mapInformation[newID]
-	if isUsed {
+	if _, isUsed := d.mapInformation[newID]; isUsed {
 		return errors.New("Key does not exist")
 	}
 
@@ -139,7 +132,6 @@ func (d *Database) Update(actualID string, newID string) error {
 	if err != nil {
 		return errors.New("new element does not exist")
 	}
-
 	var myNewElement fileinteraction.Items
 	myNewElement.Price = result.Price
 	myNewElement.Title = result.Title
@@ -161,8 +153,7 @@ func (d *Database) Delete(id string) error {
 	d.mux.Lock()
 	defer d.mux.Unlock()
 
-	_, isUsed := d.mapInformation[id]
-	if !isUsed {
+	if _, isUsed := d.mapInformation[id]; !isUsed {
 		return errors.New("Key does not exist")
 	}
 	delete(d.mapInformation, id)

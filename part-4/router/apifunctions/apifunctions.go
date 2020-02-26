@@ -17,6 +17,7 @@ type Item struct {
 	Quantity string `json:"quantity"`
 }
 
+/*Genere a new response, encode results how Json*/
 func response(w http.ResponseWriter, status int, results interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
@@ -27,9 +28,10 @@ func response(w http.ResponseWriter, status int, results interface{}) {
 func ReturnCar(w http.ResponseWriter, r *http.Request) {
 	dataBase := db.CreateNewDBInstance()
 	dataBase.LoadFile()
+
 	carMap, err := dataBase.ReturnMap()
 	if err != nil {
-		response(w, http.StatusConflict, carMap)
+		response(w, http.StatusConflict, err)
 		return
 	}
 	response(w, http.StatusOK, carMap)
@@ -53,17 +55,21 @@ func AddItem(w http.ResponseWriter, r *http.Request) {
 	dataBase := db.CreateNewDBInstance()
 	dataBase.LoadFile()
 	itemID := mux.Vars(r)["itemID"]
-	err := dataBase.Add(itemID)
+	if err := dataBase.Add(itemID); err != nil {
+		response(w, http.StatusConflict, nil)
+		return
+	}
+
+	if err := dataBase.SaveFile(); err != nil {
+		response(w, http.StatusConflict, nil)
+		return
+	}
+
+	jsonString, err := json.Marshal("Item Added")
 	if err != nil {
 		response(w, http.StatusConflict, nil)
 		return
 	}
-	err = dataBase.SaveFile()
-	if err != nil {
-		response(w, http.StatusConflict, nil)
-		return
-	}
-	jsonString, _ := json.Marshal("Item Added")
 	response(w, http.StatusOK, jsonString)
 }
 
@@ -77,23 +83,21 @@ func UpdateItem(w http.ResponseWriter, r *http.Request) {
 	var item Item
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		response(w, http.StatusBadRequest, data)
+		response(w, http.StatusBadRequest, err)
 		return
 	}
-	err = json.Unmarshal(data, &item)
-	if err != nil {
-		response(w, http.StatusConflict, data)
+	if er := json.Unmarshal(data, &item); er != nil {
+		response(w, http.StatusConflict, er)
 		return
 	}
 
-	err = dataBase.Update(itemID, item.ID)
-	if err != nil {
+	if er := dataBase.Update(itemID, item.ID); er != nil {
 		response(w, http.StatusConflict, item.ID)
 		return
 	}
-	err = dataBase.SaveFile()
-	if err != nil {
-		response(w, http.StatusConflict, nil)
+
+	if er := dataBase.SaveFile(); er != nil {
+		response(w, http.StatusConflict, er)
 		return
 	}
 	jsonString, _ := json.Marshal("Item Added")
@@ -105,16 +109,21 @@ func DeleteItem(w http.ResponseWriter, r *http.Request) {
 	dataBase := db.CreateNewDBInstance()
 	dataBase.LoadFile()
 	itemID := mux.Vars(r)["itemID"]
-	err := dataBase.Delete(itemID)
-	if err != nil {
-		response(w, http.StatusConflict, nil)
+
+	if err := dataBase.Delete(itemID); err != nil {
+		response(w, http.StatusConflict, err)
 		return
 	}
-	err = dataBase.SaveFile()
-	if err != nil {
-		response(w, http.StatusConflict, nil)
+
+	if err := dataBase.SaveFile(); err != nil {
+		response(w, http.StatusConflict, err)
 		return
 	}
-	jsonString, _ := json.Marshal("Item Added")
+
+	jsonString, err := json.Marshal("Item Added")
+	if err != nil {
+		response(w, http.StatusConflict, err)
+		return
+	}
 	response(w, http.StatusOK, jsonString)
 }
