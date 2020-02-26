@@ -10,7 +10,6 @@ import (
 
 /*FileActions have all function for handle the interecctions with files*/
 type FileActions interface {
-	SetFile(string)
 	ReadFile(map[string]string) error
 	WriteFile(map[string]string) error
 	ReturnDestinyFile() string
@@ -22,13 +21,10 @@ type DestinyFile struct {
 }
 
 /*CreateNewFInstance create new instance of the object*/
-func CreateNewFInstance() *DestinyFile {
-	return &DestinyFile{}
-}
-
-/*SetFile save new route file*/
-func (d *DestinyFile) SetFile(destiny string) {
-	d.destinyFile = destiny
+func CreateNewFInstance(destiny string) *DestinyFile {
+	newDF := &DestinyFile{}
+	newDF.destinyFile = destiny
+	return newDF
 }
 
 /*ReadFile reed information from file saved
@@ -53,7 +49,9 @@ func (d *DestinyFile) ReadFile(externalMap map[string]string) error {
 		return err
 	}
 
-	externalMap = make(map[string]string)
+	for key := range externalMap {
+		delete(externalMap, key)
+	}
 
 	sliceWithElements := strings.Split(string(fileBytes), "\n")
 

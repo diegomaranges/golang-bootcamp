@@ -29,8 +29,7 @@ type Database struct {
 func CreateNewDBInstance(destinyFile string) *Database {
 	newDB := &Database{}
 	newDB.mapInformation = make(map[string]string)
-	newDB.file = fileinteraction.CreateNewFInstance()
-	newDB.file.SetFile(destinyFile)
+	newDB.file = fileinteraction.CreateNewFInstance(destinyFile)
 	return newDB
 }
 

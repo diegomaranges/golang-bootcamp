@@ -19,6 +19,9 @@ func main() {
 	inputType := bufio.NewScanner(os.Stdin)
 
 	myDataBase := db.CreateNewDBInstance(destinyFile)
+	if myDataBase.LoadFile() != nil {
+		fmt.Println("error to load")
+	}
 
 	for {
 		myDataBase.PtrintMap()
@@ -90,6 +93,7 @@ func main() {
 			}
 
 		case "exit":
+			myDataBase.SaveFile()
 			return
 
 		default:
