@@ -93,7 +93,12 @@ func main() {
 			}
 
 		case "exit":
-			myDataBase.SaveFile()
+			err := myDataBase.SaveFile()
+			if err == nil {
+				fmt.Println("save db")
+				return
+			}
+			fmt.Println(err)
 			return
 
 		default:
