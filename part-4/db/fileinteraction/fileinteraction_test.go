@@ -1,39 +1,62 @@
 package fileinteraction
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestOne(t *testing.T) {
-	file := CreateNewFInstance("")
-	var mapExample map[string]*Items
-	mapExample = make(map[string]*Items)
-	var quantity int
+const destinyFile = "cars/dbtest.json"
 
-	/*Set destiny file*/
-	resultDestiny := file.ReturnDestinyFile()
-	assert.Equal(t, resultDestiny, "db.json", "Error to set a destiny file")
+func TestCreateFile(t *testing.T) {
+	os.Remove(destinyFile)
+	testInstance := CreateNewFInstance("test")
+	err := testInstance.CreateFile()
+	assert.NoError(t, err, "error: return a error when try create a new file non existent")
 
-	/*Read and load empty file*/
-	err := file.ReadFile(mapExample)
-	assert.Equal(t, len(mapExample), 3, "Error to read and load a non-empty file")
-	assert.NoError(t, err, "Error to read and load a non-empty file")
-	quantity = mapExample["1"].Quantity
+	err = testInstance.CreateFile()
+	assert.Error(t, err, "error: no return a error when try create a new file and this already exist")
+}
 
-	mapExample["1"].Quantity++
+func TestReadFile(t *testing.T) {
+	testInstance := CreateNewFInstance("testRead")
+	testMap := make(map[string]*Items)
 
-	/*write 2 elements in the file*/
-	err = file.WriteFile(mapExample)
-	assert.NoError(t, err, "Error to write the map into the file")
+	err := testInstance.ReadFile(testMap)
+	assert.NoError(t, err, "error: unexpected error tring read a test file")
+	assert.Equal(t, 2, len(testMap), "error: ReadFile does not load all elements")
+}
 
-	/*Read and load non-empty file*/
-	err = file.ReadFile(mapExample)
-	assert.Equal(t, len(mapExample), 3, "Error to read and load a non-empty file")
-	assert.Equal(t, mapExample["1"].Quantity, quantity+1, "Error to write the map into the file")
-	assert.NoError(t, err, "Error to read and load a non-empty file")
+func TestWriteFile(t *testing.T) {
+	testInstance := CreateNewFInstance("testRead")
+	testMap := make(map[string]*Items)
 
-	err = file.WriteFile(mapExample)
-	assert.NoError(t, err, "Error with the final write")
+	err := testInstance.ReadFile(testMap)
+	assert.NoError(t, err, "error: unexpected error tring read a test file in write test")
+	assert.Equal(t, 2, len(testMap), "error: ReadFile does not load all elements in write test")
+
+	testInstanceWrite := CreateNewFInstance("testWrite")
+
+	err = testInstanceWrite.WriteFile(testMap)
+	assert.NoError(t, err, "error: unexpected error tring write a test file")
+	assert.Equal(t, 2, len(testMap), "error: WriteFile modify quantity of items")
+}
+
+func TestDeleteFile(t *testing.T) {
+	testInstance := CreateNewFInstance("testDelete")
+	err := testInstance.CreateFile()
+	assert.NoError(t, err, "error: return a error when try create a new file non existent in delete test")
+
+	err = testInstance.DeleteFile()
+	assert.NoError(t, err, "error: does not delete the test file")
+
+	err = testInstance.DeleteFile()
+	assert.Error(t, err, "error: does not error occurred when try delete the non existent file")
+}
+
+func TestReturnDestinyFile(t *testing.T) {
+	testInstance := CreateNewFInstance("test")
+	destiny := testInstance.ReturnDestinyFile()
+	assert.Equal(t, destinyFile, destiny, "error: does not is a correct directory or file")
 }

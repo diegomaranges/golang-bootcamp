@@ -16,7 +16,6 @@ type Items struct {
 
 /*FileActions have all function for handle the interecctions with files*/
 type FileActions interface {
-	SetFile(string)
 	CreateFile() error
 	ReadFile(map[string]*Items) error
 	WriteFile(map[string]*Items) error
