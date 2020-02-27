@@ -28,13 +28,13 @@ func GetAllElements() ([]Item, error) {
 	if err != nil || response.StatusCode != 200 {
 		return result, errors.New("error tring read json response")
 	}
-	defer response.Body.Close()
 
 	if er := json.Unmarshal(data, &result); er != nil {
+		response.Body.Close()
 		return result, errors.New("error tring parse json response")
 	}
 
-	return result, nil
+	return result, response.Body.Close()
 }
 
 /*GetElement (particular item from the API) Return a error if the API request fail or can read the json response*/
@@ -49,11 +49,11 @@ func GetElement(id string) (Item, error) {
 	if err != nil || response.StatusCode != 200 {
 		return result, errors.New("error tring read json response")
 	}
-	defer response.Body.Close()
 
 	if er := json.Unmarshal(data, &result); er != nil {
+		response.Body.Close()
 		return result, errors.New("error tring parse json response")
 	}
 
-	return result, nil
+	return result, response.Body.Close()
 }
