@@ -30,7 +30,7 @@ type DestinyFile struct {
 }
 
 const fileType = ".json"
-const fileName = "db"
+const fileName = "cars/db"
 
 /*CreateNewFInstance create new instance and save the destiny file*/
 func CreateNewFInstance(dbID string) *DestinyFile {
