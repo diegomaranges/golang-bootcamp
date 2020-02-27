@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-/*Item algo*/
+/*Item is the structure used for read all different items from challenge API*/
 type Item struct {
 	ID    string `json:"id"`
 	Title string `json:"title"`
@@ -16,36 +16,44 @@ type Item struct {
 
 const url = "http://challenge.getsandbox.com/articles"
 
-/*GetAllElements algo*/
+/*GetAllElements (all items from the API) Return a error if the API request fail or can read the json response*/
 func GetAllElements() ([]Item, error) {
 	var result []Item
 	response, err := http.Get(url)
 	if err != nil || response.StatusCode != 200 {
 		return result, errors.New("error tring read challenge API")
 	}
+
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil || response.StatusCode != 200 {
-		return result, errors.New("error tring read challenge API")
+		return result, errors.New("error tring read json response")
 	}
 	defer response.Body.Close()
-	json.Unmarshal(data, &result)
+
+	if er := json.Unmarshal(data, &result); er != nil {
+		return result, errors.New("error tring parse json response")
+	}
 
 	return result, nil
 }
 
-/*GetElement algo*/
+/*GetElement (particular item from the API) Return a error if the API request fail or can read the json response*/
 func GetElement(id string) (Item, error) {
 	var result Item
 	response, err := http.Get(url + "/" + id)
 	if err != nil || response.StatusCode != 200 {
 		return result, errors.New("error tring read challenge API")
 	}
+
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil || response.StatusCode != 200 {
-		return result, errors.New("error tring read challenge API")
+		return result, errors.New("error tring read json response")
 	}
 	defer response.Body.Close()
-	json.Unmarshal(data, &result)
+
+	if er := json.Unmarshal(data, &result); er != nil {
+		return result, errors.New("error tring parse json response")
+	}
 
 	return result, nil
 }
