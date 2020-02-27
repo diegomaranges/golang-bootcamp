@@ -8,8 +8,6 @@ import (
 	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db/readapi"
 )
 
-const destinyFile string = "db"
-
 /*CRUD All function that you can use in this interface.
 Use Init when declare an element with this interface */
 type CRUD interface {
@@ -30,13 +28,16 @@ type Database struct {
 }
 
 /*CreateNewDBInstance create new instance of the object*/
-func CreateNewDBInstance() *Database {
+func CreateNewDBInstance(carID string, createNewDB bool) (*Database, error) {
+	if createNewDB {
+		tempDB := fileinteraction.CreateNewFInstance(carID)
+		return nil, tempDB.CreateFile()
+	}
 	dataBase := &Database{}
 	dataBase.mapInformation = make(map[string]*fileinteraction.Items)
-	dataBase.file = fileinteraction.CreateNewFInstance()
-	dataBase.file.SetFile(destinyFile)
+	dataBase.file = fileinteraction.CreateNewFInstance(carID)
 	dataBase.mux = &sync.Mutex{}
-	return dataBase
+	return dataBase, nil
 }
 
 /*LoadFile load file and save information in the db if have a correct syntax
@@ -69,7 +70,7 @@ func (d *Database) Add(newID string) error {
 
 	result, err := readapi.GetElement(newID)
 	if err != nil {
-		return errors.New("element doesnt exist")
+		return errors.New("irem doesnt exist")
 	}
 
 	var myNewElement fileinteraction.Items
@@ -94,7 +95,7 @@ func (d *Database) Retrieve(id string) (fileinteraction.Items, error) {
 	d.mux.Lock()
 	defer d.mux.Unlock()
 	if _, isUsed := d.mapInformation[id]; !isUsed {
-		return errorCase, errors.New("element does not exist")
+		return errorCase, errors.New("item does not exist")
 	}
 
 	return *d.mapInformation[id], nil
@@ -102,7 +103,7 @@ func (d *Database) Retrieve(id string) (fileinteraction.Items, error) {
 
 /*ReturnMap show db in the console
 Pre: Database != nil;
-Pos: Show for console all items in the Database*/
+Pos: Return the map and nil error*/
 func (d *Database) ReturnMap() (map[string]*fileinteraction.Items, error) {
 	if d.mapInformation == nil {
 		return nil, errors.New("map is not initialized")
@@ -130,7 +131,7 @@ func (d *Database) Update(actualID string, newID string) error {
 
 	result, err := readapi.GetElement(newID)
 	if err != nil {
-		return errors.New("new element does not exist")
+		return errors.New("new item does not exist")
 	}
 	var myNewElement fileinteraction.Items
 	myNewElement.Price = result.Price

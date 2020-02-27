@@ -8,7 +8,8 @@ import (
 )
 
 func TestAdd(t *testing.T) {
-	myDataBase := CreateNewDBInstance()
+	myDataBase, er := CreateNewDBInstance("1", false)
+	assert.NoError(t, er, "error: tring create a new db instance")
 
 	tables := []struct {
 		key           string
@@ -34,7 +35,8 @@ func TestAdd(t *testing.T) {
 }
 
 func TestRetrieve(t *testing.T) {
-	myDataBase := CreateNewDBInstance()
+	myDataBase, er := CreateNewDBInstance("1", false)
+	assert.NoError(t, er, "error: tring create a new db instance")
 
 	tables := []struct {
 		key     string
@@ -60,7 +62,8 @@ func TestRetrieve(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	myDataBase := CreateNewDBInstance()
+	myDataBase, er := CreateNewDBInstance("1", false)
+	assert.NoError(t, er, "error: tring create a new db instance")
 
 	tables := []struct {
 		key      string
@@ -91,7 +94,8 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	myDataBase := CreateNewDBInstance()
+	myDataBase, er := CreateNewDBInstance("1", false)
+	assert.NoError(t, er, "error: tring create a new db instance")
 
 	tables := []struct {
 		key     string

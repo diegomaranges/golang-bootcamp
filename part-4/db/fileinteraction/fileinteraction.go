@@ -17,6 +17,7 @@ type Items struct {
 /*FileActions have all function for handle the interecctions with files*/
 type FileActions interface {
 	SetFile(string)
+	CreateFile() error
 	ReadFile(map[string]*Items) error
 	WriteFile(map[string]*Items) error
 	ReturnDestinyFile() string
@@ -28,15 +29,25 @@ type DestinyFile struct {
 }
 
 const fileType = ".json"
+const fileName = "db"
 
-/*CreateNewFInstance create new instance of the object*/
-func CreateNewFInstance() *DestinyFile {
-	return &DestinyFile{}
+/*CreateNewFInstance create new instance and save the destiny file*/
+func CreateNewFInstance(dbID string) *DestinyFile {
+	destiny := &DestinyFile{}
+	destiny.destinyFile = fileName + dbID + fileType
+	return destiny
 }
 
-/*SetFile save new route file without specific the type*/
-func (d *DestinyFile) SetFile(destiny string) {
-	d.destinyFile = destiny + fileType
+/*CreateFile reed information from file saved
+Warning: If the map element have some information it will delete
+Pre: externalMap different to nil*/
+func (d *DestinyFile) CreateFile() error {
+	_, err := ioutil.ReadFile(d.destinyFile)
+	if err == nil {
+		return errors.New("File directory already exist")
+	}
+
+	return ioutil.WriteFile(d.destinyFile, nil, os.ModePerm)
 }
 
 /*ReadFile reed information from file saved
@@ -71,8 +82,7 @@ func (d *DestinyFile) WriteFile(externalMap map[string]*Items) error {
 		return err
 	}
 
-	ioutil.WriteFile(d.destinyFile, jsonString, os.ModePerm)
-	return nil
+	return ioutil.WriteFile(d.destinyFile, jsonString, os.ModePerm)
 }
 
 /*ReturnDestinyFile return a route string saved*/

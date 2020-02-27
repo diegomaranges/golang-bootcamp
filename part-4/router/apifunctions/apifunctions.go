@@ -9,12 +9,22 @@ import (
 	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db"
 )
 
-/*Item algo*/
+const carPath = "carID"
+const itemPath = "itemID"
+
+/*Item is a struct used for read element from the Json requests*/
 type Item struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
 	Price    string `json:"price"`
 	Quantity string `json:"quantity"`
+}
+
+/*Genere a new error response, encode results how Json*/
+func errorResponse(w http.ResponseWriter, status int, results error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	http.Error(w, results.Error(), status)
 }
 
 /*Genere a new response, encode results how Json*/
@@ -24,105 +34,156 @@ func response(w http.ResponseWriter, status int, results interface{}) {
 	json.NewEncoder(w).Encode(results)
 }
 
-/*ReturnCar algo*/
+/*CreateNewCar return status 201 if the car is already exist*/
+func CreateNewCar(w http.ResponseWriter, r *http.Request) {
+	if _, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], true); err != nil {
+		errorResponse(w, http.StatusCreated, err)
+	}
+	response(w, http.StatusOK, nil)
+}
+
+/*ReturnCar return status 404 if the car does not exist,
+  status 409 if have any error traing to load the file or read the Map*/
 func ReturnCar(w http.ResponseWriter, r *http.Request) {
-	dataBase := db.CreateNewDBInstance()
-	dataBase.LoadFile()
+	dataBase, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], false)
+	if err != nil {
+		errorResponse(w, http.StatusNotFound, err)
+	}
+
+	if er := dataBase.LoadFile(); er != nil {
+		errorResponse(w, http.StatusConflict, er)
+	}
 
 	carMap, err := dataBase.ReturnMap()
 	if err != nil {
-		response(w, http.StatusConflict, err)
+		errorResponse(w, http.StatusConflict, err)
 		return
 	}
 	response(w, http.StatusOK, carMap)
 }
 
-/*ReturnItem algo*/
+/*ReturnItem return status 404 if the car does not exist or the car does not have this item
+  status 409 if have any error load data*/
 func ReturnItem(w http.ResponseWriter, r *http.Request) {
-	dataBase := db.CreateNewDBInstance()
-	dataBase.LoadFile()
-	itemID := mux.Vars(r)["itemID"]
+	dataBase, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], false)
+	if err != nil {
+		errorResponse(w, http.StatusNotFound, err)
+	}
+
+	if er := dataBase.LoadFile(); er != nil {
+		errorResponse(w, http.StatusConflict, er)
+	}
+
+	itemID := mux.Vars(r)[itemPath]
 	item, err := dataBase.Retrieve(itemID)
 	if err != nil {
-		response(w, http.StatusNotFound, item)
+		errorResponse(w, http.StatusNotFound, err)
 		return
 	}
 	response(w, http.StatusOK, item)
 }
 
-/*AddItem algo*/
+/*AddItem return status 404 if the car does not exist
+  status 409 if have any error load/save data, adding the item or create Json response*/
 func AddItem(w http.ResponseWriter, r *http.Request) {
-	dataBase := db.CreateNewDBInstance()
-	dataBase.LoadFile()
-	itemID := mux.Vars(r)["itemID"]
-	if err := dataBase.Add(itemID); err != nil {
-		response(w, http.StatusConflict, nil)
-		return
-	}
-
-	if err := dataBase.SaveFile(); err != nil {
-		response(w, http.StatusConflict, nil)
-		return
-	}
-
-	jsonString, err := json.Marshal("Item Added")
+	dataBase, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], false)
 	if err != nil {
-		response(w, http.StatusConflict, nil)
-		return
-	}
-	response(w, http.StatusOK, jsonString)
-}
-
-/*UpdateItem algo*/
-func UpdateItem(w http.ResponseWriter, r *http.Request) {
-	dataBase := db.CreateNewDBInstance()
-	dataBase.LoadFile()
-
-	itemID := mux.Vars(r)["itemID"]
-
-	var item Item
-	data, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		response(w, http.StatusBadRequest, err)
-		return
-	}
-	if er := json.Unmarshal(data, &item); er != nil {
-		response(w, http.StatusConflict, er)
-		return
+		errorResponse(w, http.StatusNotFound, err)
 	}
 
-	if er := dataBase.Update(itemID, item.ID); er != nil {
-		response(w, http.StatusConflict, item.ID)
+	if er := dataBase.LoadFile(); er != nil {
+		errorResponse(w, http.StatusConflict, er)
+	}
+
+	itemID := mux.Vars(r)[itemPath]
+	if er := dataBase.Add(itemID); er != nil {
+		errorResponse(w, http.StatusConflict, er)
 		return
 	}
 
 	if er := dataBase.SaveFile(); er != nil {
-		response(w, http.StatusConflict, er)
-		return
-	}
-	jsonString, _ := json.Marshal("Item Added")
-	response(w, http.StatusOK, jsonString)
-}
-
-/*DeleteItem algo*/
-func DeleteItem(w http.ResponseWriter, r *http.Request) {
-	dataBase := db.CreateNewDBInstance()
-	dataBase.LoadFile()
-	itemID := mux.Vars(r)["itemID"]
-
-	if err := dataBase.Delete(itemID); err != nil {
-		response(w, http.StatusConflict, err)
-		return
-	}
-
-	if err := dataBase.SaveFile(); err != nil {
-		response(w, http.StatusConflict, err)
+		errorResponse(w, http.StatusConflict, er)
 		return
 	}
 
 	jsonString, err := json.Marshal("Item Added")
 	if err != nil {
-		response(w, http.StatusConflict, err)
+		errorResponse(w, http.StatusConflict, err)
+		return
+	}
+	response(w, http.StatusOK, jsonString)
+}
+
+/*UpdateItem return status 404 if the car does not exist
+status 409 if have any error load/save data, updating the item or create/read Json request/response
+status 400 if Json received is wrong*/
+func UpdateItem(w http.ResponseWriter, r *http.Request) {
+	dataBase, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], false)
+	if err != nil {
+		errorResponse(w, http.StatusNotFound, err)
+	}
+
+	if er := dataBase.LoadFile(); er != nil {
+		errorResponse(w, http.StatusConflict, er)
+	}
+
+	itemID := mux.Vars(r)[itemPath]
+	var item Item
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		errorResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	if er := json.Unmarshal(data, &item); er != nil {
+		errorResponse(w, http.StatusConflict, er)
+		return
+	}
+
+	if er := dataBase.Update(itemID, item.ID); er != nil {
+		errorResponse(w, http.StatusConflict, er)
+		return
+	}
+
+	if er := dataBase.SaveFile(); er != nil {
+		errorResponse(w, http.StatusConflict, er)
+		return
+	}
+
+	jsonString, err := json.Marshal("Item Added")
+	if err != nil {
+		errorResponse(w, http.StatusConflict, err)
+		return
+	}
+	response(w, http.StatusOK, jsonString)
+}
+
+/*DeleteItem status 404 if the car does not exist
+  status 409 if have any error load/save data, erasing the item or create Json response*/
+func DeleteItem(w http.ResponseWriter, r *http.Request) {
+	dataBase, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], false)
+	if err != nil {
+		errorResponse(w, http.StatusNotFound, err)
+	}
+
+	if er := dataBase.LoadFile(); er != nil {
+		errorResponse(w, http.StatusConflict, er)
+	}
+
+	itemID := mux.Vars(r)[itemPath]
+	if err := dataBase.Delete(itemID); err != nil {
+		errorResponse(w, http.StatusConflict, err)
+		return
+	}
+
+	if err := dataBase.SaveFile(); err != nil {
+		errorResponse(w, http.StatusConflict, err)
+		return
+	}
+
+	jsonString, err := json.Marshal("Item Added")
+	if err != nil {
+		errorResponse(w, http.StatusConflict, err)
 		return
 	}
 	response(w, http.StatusOK, jsonString)

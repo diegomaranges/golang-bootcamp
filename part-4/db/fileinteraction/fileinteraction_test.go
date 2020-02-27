@@ -7,13 +7,12 @@ import (
 )
 
 func TestOne(t *testing.T) {
-	file := CreateNewFInstance()
+	file := CreateNewFInstance("")
 	var mapExample map[string]*Items
 	mapExample = make(map[string]*Items)
 	var quantity int
 
 	/*Set destiny file*/
-	file.SetFile("db")
 	resultDestiny := file.ReturnDestinyFile()
 	assert.Equal(t, resultDestiny, "db.json", "Error to set a destiny file")
 
