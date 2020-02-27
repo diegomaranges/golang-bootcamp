@@ -34,7 +34,9 @@ func response(w http.ResponseWriter, status int, results interface{}) {
 	json.NewEncoder(w).Encode(results)
 }
 
-/*CreateNewCar return status 201 if the car is already exist*/
+/*CreateNewCar return
+
+status 201 if the car is already exist*/
 func CreateNewCar(w http.ResponseWriter, r *http.Request) {
 	if _, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], true); err != nil {
 		errorResponse(w, http.StatusCreated, err)
@@ -42,8 +44,11 @@ func CreateNewCar(w http.ResponseWriter, r *http.Request) {
 	response(w, http.StatusOK, nil)
 }
 
-/*ReturnCar return status 404 if the car does not exist,
-  status 409 if have any error traing to load the file or read the Map*/
+/*ReturnCar return
+
+status 404 if the car does not exist,
+
+status 409 if have any error traing to load the file or read the Map*/
 func ReturnCar(w http.ResponseWriter, r *http.Request) {
 	dataBase, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], false)
 	if err != nil {
@@ -62,7 +67,9 @@ func ReturnCar(w http.ResponseWriter, r *http.Request) {
 	response(w, http.StatusOK, carMap)
 }
 
-/*DeleteCar return status 404 if the car does not exist or the car does not deleted*/
+/*DeleteCar return
+
+status 404 if the car does not exist or the car does not deleted*/
 func DeleteCar(w http.ResponseWriter, r *http.Request) {
 	myDB, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], false)
 	if err != nil {
@@ -76,8 +83,11 @@ func DeleteCar(w http.ResponseWriter, r *http.Request) {
 	response(w, http.StatusOK, nil)
 }
 
-/*ReturnItem return status 404 if the car does not exist or the car does not have this item
-  status 409 if have any error load data*/
+/*ReturnItem return
+
+status 404 if the car does not exist or the car does not have this item
+
+status 409 if have any error load data*/
 func ReturnItem(w http.ResponseWriter, r *http.Request) {
 	dataBase, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], false)
 	if err != nil {
@@ -97,8 +107,11 @@ func ReturnItem(w http.ResponseWriter, r *http.Request) {
 	response(w, http.StatusOK, item)
 }
 
-/*AddItem return status 404 if the car does not exist
-  status 409 if have any error load/save data, adding the item or create Json response*/
+/*AddItem return
+
+status 404 if the car does not exist
+
+status 409 if have any error load/save data, adding the item or create Json response*/
 func AddItem(w http.ResponseWriter, r *http.Request) {
 	dataBase, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], false)
 	if err != nil {
@@ -128,8 +141,12 @@ func AddItem(w http.ResponseWriter, r *http.Request) {
 	response(w, http.StatusOK, jsonString)
 }
 
-/*UpdateItem return status 404 if the car does not exist
+/*UpdateItem return
+
+status 404 if the car does not exist
+
 status 409 if have any error load/save data, updating the item or create/read Json request/response
+
 status 400 if Json received is wrong*/
 func UpdateItem(w http.ResponseWriter, r *http.Request) {
 	dataBase, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], false)
@@ -172,8 +189,11 @@ func UpdateItem(w http.ResponseWriter, r *http.Request) {
 	response(w, http.StatusOK, jsonString)
 }
 
-/*DeleteItem status 404 if the car does not exist
-  status 409 if have any error load/save data, erasing the item or create Json response*/
+/*DeleteItem return
+
+status 404 if the car does not exist
+
+status 409 if have any error load/save data, erasing the item or create Json response*/
 func DeleteItem(w http.ResponseWriter, r *http.Request) {
 	dataBase, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], false)
 	if err != nil {

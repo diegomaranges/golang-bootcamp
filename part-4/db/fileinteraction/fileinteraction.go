@@ -40,7 +40,9 @@ func CreateNewFInstance(dbID string) *DestinyFile {
 }
 
 /*CreateFile reed information from file saved
+
 Warning: If the map element have some information it will delete
+
 Pre: externalMap different to nil*/
 func (d *DestinyFile) CreateFile() error {
 	_, err := ioutil.ReadFile(d.destinyFile)
@@ -52,7 +54,9 @@ func (d *DestinyFile) CreateFile() error {
 }
 
 /*ReadFile reed information from file saved
+
 Warning: If the map element have some information it will delete
+
 Pre: externalMap different to nil*/
 func (d *DestinyFile) ReadFile(externalMap map[string]*Items) error {
 	if externalMap == nil {
@@ -72,6 +76,7 @@ func (d *DestinyFile) ReadFile(externalMap map[string]*Items) error {
 }
 
 /*WriteFile write information in file saved
+
 Pre: externalMap different to nil*/
 func (d *DestinyFile) WriteFile(externalMap map[string]*Items) error {
 	if externalMap == nil {

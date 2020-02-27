@@ -8,8 +8,7 @@ import (
 	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db/readapi"
 )
 
-/*CRUD All function that you can use in this interface.
-Use Init when declare an element with this interface */
+/*CRUD All function that you can use in this interface.*/
 type CRUD interface {
 	LoadFile() error
 	Add(string) error
@@ -42,7 +41,9 @@ func CreateNewDBInstance(carID string, createNewDB bool) (*Database, error) {
 }
 
 /*LoadFile load file and save information in the db
+
 Pre: Database != nil;
+
 Pos: Return a error if can read the file*/
 func (d *Database) LoadFile() error {
 	if d.mapInformation == nil {
@@ -55,7 +56,9 @@ func (d *Database) LoadFile() error {
 }
 
 /*Add add item to car
+
 Pre: Database != nil;
+
 Pos: return a error if item does not exist in the API*/
 func (d *Database) Add(newID string) error {
 	if d.mapInformation == nil {
@@ -84,7 +87,9 @@ func (d *Database) Add(newID string) error {
 }
 
 /*Retrieve return a item from the car
+
 Pre: Database != nil;
+
 Pos: Return a error if item does not exist in the car*/
 func (d *Database) Retrieve(id string) (fileinteraction.Items, error) {
 	var errorCase fileinteraction.Items
@@ -103,7 +108,9 @@ func (d *Database) Retrieve(id string) (fileinteraction.Items, error) {
 }
 
 /*ReturnMap return all items from the car
+
 Pre: Database != nil;
+
 Pos: Return the map and nil error*/
 func (d *Database) ReturnMap() (map[string]*fileinteraction.Items, error) {
 	if d.mapInformation == nil {
@@ -114,7 +121,9 @@ func (d *Database) ReturnMap() (map[string]*fileinteraction.Items, error) {
 }
 
 /*Update rewrite item from car
+
 Pre: Database != nil;
+
 Pos: return a error if any id item is already used or not exist in the API*/
 func (d *Database) Update(actualID string, newID string) error {
 	if d.mapInformation == nil {
@@ -146,7 +155,9 @@ func (d *Database) Update(actualID string, newID string) error {
 }
 
 /*Delete remove item from car
+
 Pre: Database != nil;
+
 Pos: Return a error if the car does not have this item*/
 func (d *Database) Delete(id string) error {
 	if d.mapInformation == nil {
@@ -164,7 +175,9 @@ func (d *Database) Delete(id string) error {
 }
 
 /*SaveFile save car
+
 Pre: Database != nil;
+
 Pos: Return a error if can not write the file*/
 func (d *Database) SaveFile() error {
 	if d.mapInformation == nil {
@@ -177,7 +190,9 @@ func (d *Database) SaveFile() error {
 }
 
 /*DeleteFile delete car
+
 Pre: Database != nil;
+
 Pos: Return a error if does not exist or has any problem with remove file*/
 func (d *Database) DeleteFile() error {
 	if d.mapInformation == nil {
