@@ -18,6 +18,7 @@ type CRUD interface {
 	Update(string, string) error
 	Delete(string) error
 	SaveFile() error
+	DeleteFile() error
 }
 
 /*Database Contain a map with the items in the Database */
@@ -40,9 +41,9 @@ func CreateNewDBInstance(carID string, createNewDB bool) (*Database, error) {
 	return dataBase, nil
 }
 
-/*LoadFile load file and save information in the db if have a correct syntax
+/*LoadFile load file and save information in the db
 Pre: Database != nil;
-Pos: If have some problem with the file return -1 else, return 0*/
+Pos: Return a error if can read the file*/
 func (d *Database) LoadFile() error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
@@ -53,9 +54,9 @@ func (d *Database) LoadFile() error {
 	return d.file.ReadFile(d.mapInformation)
 }
 
-/*Add add item to db
+/*Add add item to car
 Pre: Database != nil;
-Pos: If key is existent return -1 else, return 0 and add the new item;*/
+Pos: return a error if item does not exist in the API*/
 func (d *Database) Add(newID string) error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
@@ -82,9 +83,9 @@ func (d *Database) Add(newID string) error {
 	return nil
 }
 
-/*Retrieve show item from db
+/*Retrieve return a item from the car
 Pre: Database != nil;
-Pos: If key is non-existent return -1 else, return 0 and the item value;*/
+Pos: Return a error if item does not exist in the car*/
 func (d *Database) Retrieve(id string) (fileinteraction.Items, error) {
 	var errorCase fileinteraction.Items
 
@@ -101,7 +102,7 @@ func (d *Database) Retrieve(id string) (fileinteraction.Items, error) {
 	return *d.mapInformation[id], nil
 }
 
-/*ReturnMap show db in the console
+/*ReturnMap return all items from the car
 Pre: Database != nil;
 Pos: Return the map and nil error*/
 func (d *Database) ReturnMap() (map[string]*fileinteraction.Items, error) {
@@ -112,9 +113,9 @@ func (d *Database) ReturnMap() (map[string]*fileinteraction.Items, error) {
 	return d.mapInformation, nil
 }
 
-/*Update rewrite item from db
+/*Update rewrite item from car
 Pre: Database != nil;
-Pos: If key is non-existent return -1 else, return 0 and update&return the item value;*/
+Pos: return a error if any id item is already used or not exist in the API*/
 func (d *Database) Update(actualID string, newID string) error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
@@ -144,9 +145,9 @@ func (d *Database) Update(actualID string, newID string) error {
 	return nil
 }
 
-/*Delete remove element from db
+/*Delete remove item from car
 Pre: Database != nil;
-Pos: If key is non-existent return -1 else, return 0 and remove the item;*/
+Pos: Return a error if the car does not have this item*/
 func (d *Database) Delete(id string) error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
@@ -162,9 +163,9 @@ func (d *Database) Delete(id string) error {
 	return nil
 }
 
-/*SaveFile save db in a file
+/*SaveFile save car
 Pre: Database != nil;
-Pos: If have some problem with the file return -1 else, return 0*/
+Pos: Return a error if can not write the file*/
 func (d *Database) SaveFile() error {
 	if d.mapInformation == nil {
 		return errors.New("map is not initialized")
@@ -173,4 +174,17 @@ func (d *Database) SaveFile() error {
 	defer d.mux.Unlock()
 
 	return d.file.WriteFile(d.mapInformation)
+}
+
+/*DeleteFile delete car
+Pre: Database != nil;
+Pos: Return a error if does not exist or has any problem with remove file*/
+func (d *Database) DeleteFile() error {
+	if d.mapInformation == nil {
+		return errors.New("map is not initialized")
+	}
+	d.mux.Lock()
+	defer d.mux.Unlock()
+
+	return d.file.DeleteFile()
 }

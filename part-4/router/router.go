@@ -31,6 +31,12 @@ func generateARoutes() []route {
 			apifunctions.ReturnCar,
 		},
 		route{
+			"DeleteCar",
+			http.MethodDelete,
+			"/cars/{carID}",
+			apifunctions.DeleteCar,
+		},
+		route{
 			"getSpecificItem",
 			http.MethodGet,
 			"/cars/{carID}/{itemID}",

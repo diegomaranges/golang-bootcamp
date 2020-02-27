@@ -20,6 +20,7 @@ type FileActions interface {
 	CreateFile() error
 	ReadFile(map[string]*Items) error
 	WriteFile(map[string]*Items) error
+	DeleteFile() error
 	ReturnDestinyFile() string
 }
 
@@ -83,6 +84,11 @@ func (d *DestinyFile) WriteFile(externalMap map[string]*Items) error {
 	}
 
 	return ioutil.WriteFile(d.destinyFile, jsonString, os.ModePerm)
+}
+
+/*DeleteFile return a error if the dile does not exist*/
+func (d *DestinyFile) DeleteFile() error {
+	return os.Remove(d.destinyFile)
 }
 
 /*ReturnDestinyFile return a route string saved*/

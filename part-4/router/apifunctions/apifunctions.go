@@ -62,6 +62,20 @@ func ReturnCar(w http.ResponseWriter, r *http.Request) {
 	response(w, http.StatusOK, carMap)
 }
 
+/*DeleteCar return status 404 if the car does not exist or the car does not deleted*/
+func DeleteCar(w http.ResponseWriter, r *http.Request) {
+	myDB, err := db.CreateNewDBInstance(mux.Vars(r)[carPath], false)
+	if err != nil {
+		errorResponse(w, http.StatusNotFound, err)
+	}
+
+	if er := myDB.DeleteFile(); er != nil {
+		errorResponse(w, http.StatusNotFound, er)
+	}
+
+	response(w, http.StatusOK, nil)
+}
+
 /*ReturnItem return status 404 if the car does not exist or the car does not have this item
   status 409 if have any error load data*/
 func ReturnItem(w http.ResponseWriter, r *http.Request) {
