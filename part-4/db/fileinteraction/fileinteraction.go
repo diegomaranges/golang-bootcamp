@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-/*Items algo*/
+/*Items is a structure used for read json files*/
 type Items struct {
 	Title    string `json:"title"`
 	Price    string `json:"price"`
