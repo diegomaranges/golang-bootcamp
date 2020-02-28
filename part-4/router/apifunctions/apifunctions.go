@@ -80,7 +80,7 @@ func checkIfLogIn(w http.ResponseWriter, r *http.Request) int {
 status 201 if the car is already exist*/
 func CreateNewCar(w http.ResponseWriter, r *http.Request) {
 	if status := checkIfLogIn(w, r); status != 200 {
-		errorResponse(w, status, errors.New("error login"))
+		errorResponse(w, status, errors.New("error: login fail"))
 		return
 	}
 
@@ -98,7 +98,7 @@ status 404 if the car does not exist,
 status 409 if have any error traing to load the file or read the Map*/
 func ReturnCar(w http.ResponseWriter, r *http.Request) {
 	if status := checkIfLogIn(w, r); status != 200 {
-		errorResponse(w, status, errors.New("error login"))
+		errorResponse(w, status, errors.New("error: login fail"))
 		return
 	}
 
@@ -126,7 +126,7 @@ func ReturnCar(w http.ResponseWriter, r *http.Request) {
 status 404 if the car does not exist or the car does not deleted*/
 func DeleteCar(w http.ResponseWriter, r *http.Request) {
 	if status := checkIfLogIn(w, r); status != 200 {
-		errorResponse(w, status, errors.New("error login"))
+		errorResponse(w, status, errors.New("error: login fail"))
 		return
 	}
 
@@ -151,7 +151,7 @@ status 404 if the car does not exist or the car does not have this item
 status 409 if have any error load data*/
 func ReturnItem(w http.ResponseWriter, r *http.Request) {
 	if status := checkIfLogIn(w, r); status != 200 {
-		errorResponse(w, status, errors.New("error login"))
+		errorResponse(w, status, errors.New("error: login fail"))
 		return
 	}
 
@@ -182,7 +182,7 @@ status 404 if the car does not exist
 status 409 if have any error load/save data, adding the item or create Json response*/
 func AddItem(w http.ResponseWriter, r *http.Request) {
 	if status := checkIfLogIn(w, r); status != 200 {
-		errorResponse(w, status, errors.New("error login"))
+		errorResponse(w, status, errors.New("error: login fail"))
 		return
 	}
 
@@ -225,7 +225,7 @@ status 409 if have any error load/save data, updating the item or create/read Js
 status 400 if Json received is wrong*/
 func UpdateItem(w http.ResponseWriter, r *http.Request) {
 	if status := checkIfLogIn(w, r); status != 200 {
-		errorResponse(w, status, errors.New("error login"))
+		errorResponse(w, status, errors.New("error: login fail"))
 		return
 	}
 
@@ -278,7 +278,7 @@ status 404 if the car does not exist
 status 409 if have any error load/save data, erasing the item or create Json response*/
 func DeleteItem(w http.ResponseWriter, r *http.Request) {
 	if status := checkIfLogIn(w, r); status != 200 {
-		errorResponse(w, status, errors.New("error login"))
+		errorResponse(w, status, errors.New("error: login fail"))
 		return
 	}
 
