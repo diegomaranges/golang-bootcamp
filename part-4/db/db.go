@@ -76,7 +76,7 @@ func (d *Database) Add(newID string) error {
 
 	result, err := readapi.GetElement(newID)
 	if err != nil {
-		return errors.New("irem doesnt exist")
+		return errors.New("item does not exist")
 	}
 
 	var myNewElement fileinteraction.Items

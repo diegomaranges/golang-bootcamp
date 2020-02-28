@@ -7,112 +7,295 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const directory = "testdb/"
+
+func TestLoadFile(t *testing.T) {
+	tempDB, err := CreateNewDBInstance(directory, "testRead", false)
+	assert.NoError(t, err, "error: tring create a new db instance")
+
+	expectedValues := []struct {
+		id       string
+		title    string
+		price    string
+		quantity int
+	}{
+		{
+			id:       "12",
+			title:    "Pizza",
+			price:    "13.10",
+			quantity: 1,
+		},
+		{
+			id:       "2",
+			title:    "Apple",
+			price:    "3.20",
+			quantity: 3,
+		},
+	}
+
+	err = tempDB.LoadFile()
+	assert.NoError(t, err, "error: tring load file")
+
+	for _, item := range expectedValues {
+		value, isUsed := tempDB.mapInformation[item.id]
+		assert.True(t, isUsed, "error: item does not exist in the map")
+		assert.Equal(t, item.title, value.Title, "error: wrong item title")
+		assert.Equal(t, item.price, value.Price, "error: wrong item price")
+		assert.Equal(t, item.quantity, value.Quantity, "error: wrong item quantity")
+	}
+}
+
 func TestAdd(t *testing.T) {
-	myDataBase, er := CreateNewDBInstance("1", false)
-	assert.NoError(t, er, "error: tring create a new db instance")
+	tempDB, err := CreateNewDBInstance(directory, "testRead", false)
+	assert.NoError(t, err, "error: tring create a new db instance")
 
-	tables := []struct {
-		key           string
-		value         string
-		expectedValue string
-		length        int
-		err           error
-		element       string
+	expectedValues := []struct {
+		key              string
+		expectedTitle    string
+		expectedPrice    string
+		expectedQuantity int
+		length           int
+		err              error
 	}{
-		{"1", "1", "1", 1, nil, "first"},
-		{"2", "2", "2", 2, nil, "second"},
-		{"2", "5", "2", 2, errors.New("Key is already exist"), "second"},
-		{"3", "3", "3", 3, nil, "third"},
-		{"4", "4", "4", 4, nil, "fourth"},
+		{
+			key:              "1",
+			expectedTitle:    "Bannana",
+			expectedPrice:    "2.50",
+			expectedQuantity: 1,
+			length:           1,
+			err:              nil,
+		},
+		{
+			key:              "4",
+			expectedTitle:    "Noodles",
+			expectedPrice:    "23.50",
+			expectedQuantity: 1,
+			length:           2,
+			err:              nil,
+		},
+		{
+			key:              "4",
+			expectedTitle:    "Noodles",
+			expectedPrice:    "23.50",
+			expectedQuantity: 2,
+			length:           2,
+			err:              nil,
+		},
+		{
+			key:              "12",
+			expectedTitle:    "Pizza",
+			expectedPrice:    "13.10",
+			expectedQuantity: 1,
+			length:           3,
+			err:              nil,
+		},
+		{
+			key:              "15",
+			expectedTitle:    "",
+			expectedPrice:    "",
+			expectedQuantity: 1,
+			length:           3,
+			err:              errors.New("item does not exist"),
+		},
 	}
 
-	for _, table := range tables {
-		err := myDataBase.Add(table.key)
-		assert.Equal(t, table.length, len(myDataBase.mapInformation), "error: element was not added", table.element)
-		assert.Equal(t, table.err, err, "error: element added error", table.element)
-		assert.Equal(t, table.expectedValue, myDataBase.mapInformation[table.key], "error: element add a wrong value")
-	}
-}
-
-func TestRetrieve(t *testing.T) {
-	myDataBase, er := CreateNewDBInstance("1", false)
-	assert.NoError(t, er, "error: tring create a new db instance")
-
-	tables := []struct {
-		key     string
-		value   string
-		length  int
-		err     error
-		element string
-	}{
-		{"1", "1", 5, nil, "first"},
-		{"2", "2", 5, nil, "second"},
-		{"3", "3", 5, nil, "third"},
-		{"4", "4", 5, nil, "fourth"},
-		{"124", "34", 5, nil, "fifth"},
-		{"125", "", 5, errors.New("Key does not exist"), "fifth"},
-	}
-
-	for _, table := range tables {
-		value, err := myDataBase.Retrieve(table.key)
-		assert.Equal(t, table.value, value, "error: do not retrieve a correct value", table.element)
-		assert.Equal(t, table.length, len(myDataBase.mapInformation), "error: retrieve edit the map", table.element)
-		assert.Equal(t, table.err, err, "error: do not retrieved", table.element)
-	}
-}
-
-func TestUpdate(t *testing.T) {
-	myDataBase, er := CreateNewDBInstance("1", false)
-	assert.NoError(t, er, "error: tring create a new db instance")
-
-	tables := []struct {
-		key      string
-		newValue string
-		isUsed   bool
-		length   int
-		err      error
-		element  string
-	}{
-		{"1", "5", true, 5, nil, "1"},
-		{"2", "6", true, 5, nil, "2"},
-		{"3", "7", true, 5, nil, "3"},
-		{"4", "8", true, 5, nil, "4"},
-		{"124", "9", true, 5, nil, "5"},
-		{"125", "", false, 5, errors.New("Key does not exist"), "6"},
-	}
-
-	for _, table := range tables {
-		err := myDataBase.Update(table.key, table.newValue)
-		assert.Equal(t, table.length, len(myDataBase.mapInformation), "error: update element edit size of map", table.element)
-		assert.Equal(t, table.err, err, "error: element was not updated", table.element)
-		value, isUsed := myDataBase.mapInformation[table.key]
-		assert.Equal(t, table.isUsed, isUsed, "error: element was not updated correctly", table.element)
-		if table.isUsed {
-			assert.Equal(t, table.newValue, value, "error: value changed when update the element", table.element)
+	for _, item := range expectedValues {
+		err := tempDB.Add(item.key)
+		assert.Equal(t, item.err, err, "error: item added error")
+		assert.Equal(t, item.length, len(tempDB.mapInformation), "error: add a wrong quantity of items")
+		if err == nil {
+			assert.Equal(t, item.expectedTitle, tempDB.mapInformation[item.key].Title, "error: item was not have a correct title")
+			assert.Equal(t, item.expectedPrice, tempDB.mapInformation[item.key].Price, "error: item was not have a correct price")
+			assert.Equal(t, item.expectedQuantity, tempDB.mapInformation[item.key].Quantity, "error: item was not have a correct quantity")
 		}
 	}
 }
 
-func TestDelete(t *testing.T) {
-	myDataBase, er := CreateNewDBInstance("1", false)
-	assert.NoError(t, er, "error: tring create a new db instance")
+func TestReturnMap(t *testing.T) {
+	tempDB, err := CreateNewDBInstance(directory, "testRead", false)
+	assert.NoError(t, err, "error: tring create a new db instance")
 
-	tables := []struct {
-		key     string
-		length  int
-		err     error
-		element string
+	expectedValues := []struct {
+		id       string
+		title    string
+		price    string
+		quantity int
 	}{
-		{"1", 4, nil, "first"},
-		{"2", 3, nil, "second"},
-		{"3", 2, nil, "third"},
-		{"4", 1, nil, "fourth"},
-		{"125", 1, errors.New("Key does not exist"), "fifth"},
+		{
+			id:       "12",
+			title:    "Pizza",
+			price:    "13.10",
+			quantity: 1,
+		},
+		{
+			id:       "2",
+			title:    "Apple",
+			price:    "3.20",
+			quantity: 3,
+		},
 	}
 
-	for _, table := range tables {
-		err := myDataBase.Delete(table.key)
-		assert.Equal(t, table.length, len(myDataBase.mapInformation), "error: element was not deleted", table.element)
-		assert.Equal(t, table.err, err, "error: element deleted error", table.element)
+	err = tempDB.LoadFile()
+	assert.NoError(t, err, "error: tring load file")
+
+	myMap, err := tempDB.ReturnMap()
+	assert.NoError(t, err, "error: tring return map")
+
+	for _, item := range expectedValues {
+		value, isUsed := myMap[item.id]
+		assert.True(t, isUsed, "error: item does not exist in the map")
+		assert.Equal(t, item.title, value.Title, "error: wrong item title")
+		assert.Equal(t, item.price, value.Price, "error: wrong item price")
+		assert.Equal(t, item.quantity, value.Quantity, "error: wrong item quantity")
 	}
+}
+
+func TestRetrieve(t *testing.T) {
+	tempDB, err := CreateNewDBInstance(directory, "testRead", false)
+	assert.NoError(t, err, "error: tring create a new db instance")
+
+	expectedValues := []struct {
+		id       string
+		title    string
+		price    string
+		quantity int
+	}{
+		{
+			id:       "12",
+			title:    "Pizza",
+			price:    "13.10",
+			quantity: 1,
+		},
+		{
+			id:       "2",
+			title:    "Apple",
+			price:    "3.20",
+			quantity: 3,
+		},
+	}
+
+	err = tempDB.LoadFile()
+	assert.NoError(t, err, "error: tring load file")
+
+	for _, item := range expectedValues {
+		myItem, err := tempDB.Retrieve(item.id)
+		assert.NoError(t, err, "error: tring retrieve a Item")
+		assert.Equal(t, item.title, myItem.Title, "error: wrong item title")
+		assert.Equal(t, item.price, myItem.Price, "error: wrong item price")
+		assert.Equal(t, item.quantity, myItem.Quantity, "error: wrong item quantity")
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	tempDB, err := CreateNewDBInstance(directory, "testRead", false)
+	assert.NoError(t, err, "error: tring create a new db instance")
+
+	expectedValues := []struct {
+		actualID string
+		newID    string
+		title    string
+		price    string
+		quantity int
+	}{
+		{
+			actualID: "12",
+			newID:    "4",
+			title:    "Noodles",
+			price:    "23.50",
+			quantity: 1,
+		},
+		{
+			actualID: "2",
+			newID:    "3",
+			title:    "Cookies",
+			price:    "10.40",
+			quantity: 3,
+		},
+	}
+
+	err = tempDB.LoadFile()
+	assert.NoError(t, err, "error: tring load file")
+
+	for _, item := range expectedValues {
+		err := tempDB.Update(item.actualID, item.newID)
+		assert.NoError(t, err, "error: tring update a Item")
+		value, isUsed := tempDB.mapInformation[item.newID]
+		assert.True(t, isUsed, "error: item does not exist in the map")
+		assert.Equal(t, item.title, value.Title, "error: wrong item title")
+		assert.Equal(t, item.price, value.Price, "error: wrong item price")
+		assert.Equal(t, item.quantity, value.Quantity, "error: wrong item quantity")
+		_, isUsed = tempDB.mapInformation[item.actualID]
+		assert.False(t, isUsed, "error: item exist in the map")
+	}
+}
+
+func TestDelete(t *testing.T) {
+	tempDB, err := CreateNewDBInstance(directory, "testRead", false)
+	assert.NoError(t, err, "error: tring create a new db instance")
+
+	expectedValues := []struct {
+		id     string
+		length int
+	}{
+		{
+			id:     "12",
+			length: 1,
+		},
+		{
+			id:     "2",
+			length: 0,
+		},
+	}
+
+	err = tempDB.LoadFile()
+	assert.NoError(t, err, "error: tring load file")
+
+	for _, item := range expectedValues {
+		_, isUsed := tempDB.mapInformation[item.id]
+		assert.True(t, isUsed, "error: item does not exist in the map")
+		err := tempDB.Delete(item.id)
+		assert.Equal(t, item.length, len(tempDB.mapInformation), "error: does not delete the items")
+		assert.NoError(t, err, "error: tring delete a Item")
+		_, isUsed = tempDB.mapInformation[item.id]
+		assert.False(t, isUsed, "error: item exist in the map")
+	}
+}
+
+func TestSaveFile(t *testing.T) {
+	tempDB, err := CreateNewDBInstance(directory, "testWrite", false)
+	assert.NoError(t, err, "error: tring create a new db instance")
+
+	examplesValues := []struct {
+		key string
+	}{
+		{
+			key: "1",
+		},
+		{
+			key: "4",
+		},
+		{
+			key: "4",
+		},
+		{
+			key: "12",
+		},
+	}
+
+	for _, item := range examplesValues {
+		err := tempDB.Add(item.key)
+		assert.NoError(t, err, "error: item added error")
+	}
+
+	assert.NoError(t, tempDB.SaveFile(), "error: does not save the map")
+}
+
+func TestDeleteFile(t *testing.T) {
+	_, err := CreateNewDBInstance(directory, "testDelete", true)
+	assert.NoError(t, err, "error: tring create a new db file")
+
+	tempDB, err := CreateNewDBInstance(directory, "testDelete", false)
+	assert.NoError(t, err, "error: tring create a new db instance")
+
+	assert.NoError(t, tempDB.DeleteFile(), "error: does not delete the map")
 }
