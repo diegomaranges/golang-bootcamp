@@ -29,12 +29,12 @@ type DestinyFile struct {
 }
 
 const fileType = ".json"
-const fileName = "cars/db"
+const fileName = "db"
 
 /*CreateNewFInstance create new instance and save the destiny file*/
-func CreateNewFInstance(dbID string) *DestinyFile {
+func CreateNewFInstance(directory string, dbID string) *DestinyFile {
 	destiny := &DestinyFile{}
-	destiny.destinyFile = fileName + dbID + fileType
+	destiny.destinyFile = directory + fileName + dbID + fileType
 	return destiny
 }
 

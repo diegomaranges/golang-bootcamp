@@ -11,6 +11,7 @@ import (
 
 const carPath = "carID"
 const itemPath = "itemID"
+const directoyDB = "cars/"
 
 /*Item is a struct used for read element from the Json requests*/
 type Item struct {
@@ -123,7 +124,7 @@ func AddItem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	itemID := mux.Vars(r)[itemPath]
-	if er := dataBase.Add(itemID); er != nil {
+	if er := dataBase.Add(directoyDB, itemID); er != nil {
 		errorResponse(w, http.StatusConflict, er)
 		return
 	}

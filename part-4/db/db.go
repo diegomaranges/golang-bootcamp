@@ -28,14 +28,14 @@ type Database struct {
 }
 
 /*CreateNewDBInstance create new instance of the object*/
-func CreateNewDBInstance(carID string, createNewDB bool) (*Database, error) {
+func CreateNewDBInstance(directory string, carID string, createNewDB bool) (*Database, error) {
 	if createNewDB {
 		tempDB := fileinteraction.CreateNewFInstance(carID)
 		return nil, tempDB.CreateFile()
 	}
 	dataBase := &Database{}
 	dataBase.mapInformation = make(map[string]*fileinteraction.Items)
-	dataBase.file = fileinteraction.CreateNewFInstance(carID)
+	dataBase.file = fileinteraction.CreateNewFInstance(directory, carID)
 	dataBase.mux = &sync.Mutex{}
 	return dataBase, nil
 }
