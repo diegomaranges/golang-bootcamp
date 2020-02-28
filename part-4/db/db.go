@@ -27,10 +27,12 @@ type Database struct {
 	mux            *sync.Mutex
 }
 
-/*CreateNewDBInstance create new instance of the object*/
+/*CreateNewDBInstance create new instance of the object using the directory and carID
+
+If createNewDB is true CreateNewDBInstance only create the file and return a nil *Database*/
 func CreateNewDBInstance(directory string, carID string, createNewDB bool) (*Database, error) {
 	if createNewDB {
-		tempDB := fileinteraction.CreateNewFInstance(carID)
+		tempDB := fileinteraction.CreateNewFInstance(directory, carID)
 		return nil, tempDB.CreateFile()
 	}
 	dataBase := &Database{}
