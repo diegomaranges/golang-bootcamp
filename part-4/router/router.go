@@ -3,8 +3,9 @@ package router
 import (
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/router/apifunctions"
+
+	"github.com/gorilla/mux"
 )
 
 type route struct {
@@ -18,6 +19,18 @@ type routes []route
 
 func generateARoutes() []route {
 	return routes{
+		route{
+			"SignIn",
+			http.MethodPost,
+			"/signin",
+			apifunctions.Signin,
+		},
+		route{
+			"Refresh",
+			http.MethodPost,
+			"/refresh",
+			apifunctions.Refresh,
+		},
 		route{
 			"CreateNewCar",
 			http.MethodPost,
