@@ -19,7 +19,7 @@ type Item struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
 	Price    string `json:"price"`
-	Quantity string `json:"quantity"`
+	Quantity int    `json:"quantity"`
 }
 
 /*Genere a new error response, encode results how Json*/

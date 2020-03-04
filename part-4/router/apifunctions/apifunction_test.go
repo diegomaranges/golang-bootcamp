@@ -1,6 +1,7 @@
 package apifunctions
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -188,6 +189,7 @@ func TestReturnItem(t *testing.T) {
 }
 
 func TestAddItem(t *testing.T) {
+	/*read file and save information from the item 1*/
 	router := mux.NewRouter()
 	response := httptest.NewRecorder()
 	router.HandleFunc("/cars/{carID}/{itemID}", ReturnItem).Methods(http.MethodGet)
@@ -202,6 +204,7 @@ func TestAddItem(t *testing.T) {
 	er := json.Unmarshal(temp, &item)
 	assert.NoError(t, er, req.URL.Path)
 
+	/*expected values*/
 	tables := []struct {
 		method   string
 		target   string
@@ -232,6 +235,7 @@ func TestAddItem(t *testing.T) {
 		},
 	}
 
+	/*run add function with the expected results*/
 	var itemResponse fileinteraction.Items
 
 	router.HandleFunc("/cars/{carID}/{itemID}", AddItem).Methods(http.MethodPost)
@@ -243,6 +247,7 @@ func TestAddItem(t *testing.T) {
 		data, _ := ioutil.ReadAll(table.response.Body)
 		assert.Equal(t, table.status, table.response.Code, string(data), req.URL.Path)
 
+		/*if was added correctly check the new quantity*/
 		if table.response.Code == http.StatusOK {
 			newResponse := httptest.NewRecorder()
 			newReq := httptest.NewRequest(http.MethodGet, "http://localhost:8080/cars/1/1", nil)
@@ -254,6 +259,115 @@ func TestAddItem(t *testing.T) {
 			er := json.Unmarshal(data, &itemResponse)
 			assert.NoError(t, er, itemResponse, req.URL.Path)
 			assert.Equal(t, item.Quantity+1, itemResponse.Quantity, newReq.URL)
+		}
+	}
+}
+
+func TestUpdateItem(t *testing.T) {
+	item9 := &Item{}
+	item2 := &Item{}
+
+	/*read file and save information from the item 1*/
+	router := mux.NewRouter()
+	response := httptest.NewRecorder()
+	router.HandleFunc("/cars/{carID}/{itemID}", ReturnItem).Methods(http.MethodGet)
+
+	req := httptest.NewRequest(http.MethodGet, "http://localhost:8080/cars/1/2", nil)
+	router.ServeHTTP(response, req)
+
+	temp, _ := ioutil.ReadAll(response.Body)
+	assert.Equal(t, http.StatusOK, response.Code, string(temp), req.URL.Path)
+
+	var item fileinteraction.Items
+	er := json.Unmarshal(temp, &item)
+	assert.NoError(t, er, req.URL.Path)
+
+	/*save in a response Item*/
+	item2.ID = "2"
+	item2.Price = item.Price
+	item2.Quantity = item.Quantity
+	item2.Title = item.Title
+	item2Bytes, er := json.Marshal(item2)
+	assert.NoError(t, er, item2)
+
+	/*load information for a new Item*/
+	item9.ID = "9"
+	item9.Price = item.Price
+	item9.Quantity = item.Quantity
+	item9.Title = item.Title
+	item9Bytes, er := json.Marshal(item9)
+	assert.NoError(t, er, item9)
+
+	/*expected values*/
+	tables := []struct {
+		method    string
+		target    string
+		reader    []byte
+		response  *httptest.ResponseRecorder
+		status    int
+		newTarget string
+	}{
+		{
+			method:    http.MethodPut,
+			target:    "http://localhost:8080/cars/1/2",
+			reader:    item9Bytes,
+			response:  httptest.NewRecorder(),
+			status:    http.StatusOK,
+			newTarget: "http://localhost:8080/cars/1/9",
+		},
+		{
+			method:    http.MethodPut,
+			target:    "http://localhost:8080/cars/1/14",
+			reader:    nil,
+			response:  httptest.NewRecorder(),
+			status:    http.StatusConflict,
+			newTarget: "",
+		},
+		{
+			method:    http.MethodPut,
+			target:    "http://localhost:8080/cars/1500/9",
+			reader:    nil,
+			response:  httptest.NewRecorder(),
+			status:    http.StatusConflict,
+			newTarget: "",
+		},
+		{
+			method:    http.MethodPut,
+			target:    "http://localhost:8080/cars/1/9",
+			reader:    nil,
+			response:  httptest.NewRecorder(),
+			status:    http.StatusConflict,
+			newTarget: "",
+		},
+		{
+			method:    http.MethodPut,
+			target:    "http://localhost:8080/cars/1/9",
+			reader:    item2Bytes,
+			response:  httptest.NewRecorder(),
+			status:    http.StatusOK,
+			newTarget: "http://localhost:8080/cars/1/2",
+		},
+	}
+
+	/*run add function with the expected results*/
+	router.HandleFunc("/cars/{carID}/{itemID}", UpdateItem).Methods(http.MethodPut)
+
+	for _, table := range tables {
+		r := bytes.NewReader(table.reader)
+		json.NewDecoder(r)
+		req = httptest.NewRequest(table.method, table.target, r)
+		req.Header.Set("Accept", "application/json")
+
+		router.ServeHTTP(table.response, req)
+		assert.Equal(t, table.status, table.response.Code, table.response.Body.String(), string(req.Header.Get("accept")), req.URL.Path, req.Body)
+
+		/*if was added correctly check the new quantity*/
+		if table.response.Code == http.StatusOK {
+			newResponse := httptest.NewRecorder()
+			newReq := httptest.NewRequest(http.MethodGet, table.target, nil)
+			router.ServeHTTP(newResponse, newReq)
+			assert.Equal(t, 404, newResponse.Code, newResponse.Code)
+
 		}
 	}
 }
