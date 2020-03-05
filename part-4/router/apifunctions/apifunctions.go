@@ -259,7 +259,7 @@ func DeleteItem(w http.ResponseWriter, r *http.Request) {
 
 	itemID := mux.Vars(r)[itemPath]
 	if err := dataBase.Delete(itemID); err != nil {
-		errorResponse(w, http.StatusConflict, err)
+		errorResponse(w, http.StatusNotFound, err)
 		return
 	}
 

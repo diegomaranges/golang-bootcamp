@@ -62,6 +62,8 @@ func TestCreateNewCar(t *testing.T) {
 		temp, _ := ioutil.ReadAll(table.response.Body)
 		assert.Equal(t, table.status, table.response.Code, string(temp), req.URL.Path)
 	}
+
+	os.Remove("cars/db2.json")
 }
 
 func TestReturnCar(t *testing.T) {
@@ -368,6 +370,64 @@ func TestUpdateItem(t *testing.T) {
 			router.ServeHTTP(newResponse, newReq)
 			assert.Equal(t, 404, newResponse.Code, newResponse.Code)
 
+		}
+	}
+}
+
+func TestDeleteItem(t *testing.T) {
+	/*read file and save information from the item 1*/
+	router := mux.NewRouter()
+	response := httptest.NewRecorder()
+	router.HandleFunc("/cars/{carID}/{itemID}", AddItem).Methods(http.MethodPost)
+
+	req := httptest.NewRequest(http.MethodPost, "http://localhost:8080/cars/1/8", nil)
+	router.ServeHTTP(response, req)
+
+	/*expected values*/
+	tables := []struct {
+		method   string
+		target   string
+		reader   io.Reader
+		response *httptest.ResponseRecorder
+		status   int
+	}{
+		{
+			method:   http.MethodDelete,
+			target:   "http://localhost:8080/cars/1500/1",
+			reader:   nil,
+			response: httptest.NewRecorder(),
+			status:   http.StatusConflict,
+		},
+		{
+			method:   http.MethodDelete,
+			target:   "http://localhost:8080/cars/1/8",
+			reader:   nil,
+			response: httptest.NewRecorder(),
+			status:   http.StatusOK,
+		},
+		{
+			method:   http.MethodDelete,
+			target:   "http://localhost:8080/cars/1/8",
+			reader:   nil,
+			response: httptest.NewRecorder(),
+			status:   http.StatusNotFound,
+		},
+	}
+	router.HandleFunc("/cars/{carID}/{itemID}", DeleteItem).Methods(http.MethodDelete)
+
+	for _, table := range tables {
+		req := httptest.NewRequest(table.method, table.target, table.reader)
+		router.ServeHTTP(table.response, req)
+
+		assert.Equal(t, table.status, table.response.Code, "error: unexpected status from the response")
+
+		/*if was added correctly check the new quantity*/
+		if table.response.Code == http.StatusOK {
+			router.HandleFunc("/cars/{carID}/{itemID}", ReturnItem).Methods(http.MethodGet)
+			newResponse := httptest.NewRecorder()
+			newReq := httptest.NewRequest(http.MethodGet, "http://localhost:8080/cars/1/8", nil)
+			router.ServeHTTP(newResponse, newReq)
+			assert.Equal(t, http.StatusNotFound, newResponse.Code, newReq.URL.Path)
 		}
 	}
 }
