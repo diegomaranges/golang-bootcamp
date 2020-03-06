@@ -2,9 +2,11 @@ package db
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db/fileinteraction"
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db/mongodb"
 	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db/readapi"
 )
 
@@ -25,6 +27,7 @@ type Database struct {
 	mapInformation map[string]*fileinteraction.Items
 	file           *fileinteraction.DestinyFile
 	mux            *sync.Mutex
+	db             *mongodb.MongoStruct
 }
 
 /*CreateNewDBInstance create new instance of the object using the directory and carID
@@ -39,6 +42,7 @@ func CreateNewDBInstance(directory string, carID string, createNewDB bool) (*Dat
 	dataBase.mapInformation = make(map[string]*fileinteraction.Items)
 	dataBase.file = fileinteraction.CreateNewFInstance(directory, carID)
 	dataBase.mux = &sync.Mutex{}
+	dataBase.db = mongodb.CreateNewDBInstance(carID)
 	return dataBase, nil
 }
 
@@ -84,6 +88,14 @@ func (d *Database) Add(newID string) error {
 	myNewElement.Title = result.Title
 	myNewElement.Quantity = 1
 	d.mapInformation[newID] = &myNewElement
+
+	var newElement mongodb.Item
+	newElement.ID = result.ID
+	newElement.Price = result.Price
+	newElement.Title = result.Title
+	newElement.Quantity = 1
+
+	fmt.Println(d.db.AddItem(newElement))
 
 	return nil
 }
