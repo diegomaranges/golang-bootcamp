@@ -74,6 +74,13 @@ func (d *Database) Add(newID string) error {
 	defer d.mux.Unlock()
 
 	if _, isUsed := d.mapInformation[newID]; isUsed {
+		var newElement mongodb.Item
+		newElement.ID = newID
+		newElement.Price = d.mapInformation[newID].Price
+		newElement.Title = d.mapInformation[newID].Title
+		newElement.Quantity = d.mapInformation[newID].Quantity + 1
+
+		fmt.Println(d.db.AddItem(newElement))
 		d.mapInformation[newID].Quantity++
 		return nil
 	}
@@ -114,6 +121,7 @@ func (d *Database) Retrieve(id string) (fileinteraction.Items, error) {
 
 	d.mux.Lock()
 	defer d.mux.Unlock()
+	fmt.Println(d.db.ReturnItem(id))
 	if _, isUsed := d.mapInformation[id]; !isUsed {
 		return errorCase, errors.New("item does not exist")
 	}
@@ -162,6 +170,12 @@ func (d *Database) Update(actualID string, newID string) error {
 	myNewElement.Title = result.Title
 	myNewElement.Quantity = d.mapInformation[actualID].Quantity
 
+	var newElement mongodb.Item
+	newElement.ID = newID
+	newElement.Price = result.Price
+	newElement.Title = result.Title
+	newElement.Quantity = d.mapInformation[actualID].Quantity
+	fmt.Println(d.db.UpdateItem(actualID, newElement))
 	d.mapInformation[newID] = &myNewElement
 	delete(d.mapInformation, actualID)
 
@@ -183,6 +197,7 @@ func (d *Database) Delete(id string) error {
 	if _, isUsed := d.mapInformation[id]; !isUsed {
 		return errors.New("Key does not exist")
 	}
+	fmt.Println(d.db.DeleteItem(id))
 	delete(d.mapInformation, id)
 
 	return nil
