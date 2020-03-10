@@ -30,25 +30,25 @@ func generateARoutes() []route {
 			http.MethodPost,
 			"/refresh",
 			apifunctions.Refresh,
-		}, /*
-			route{
-				"CreateNewCar",
-				http.MethodPost,
-				"/cars/{carID}",
-				apifunctions.CreateNewCar,
-			},*/
+		},
+		route{
+			"CreateNewCar",
+			http.MethodPost,
+			"/cars/{carID}",
+			apifunctions.CreateNewCar,
+		},
 		route{
 			"getSpecificCar",
 			http.MethodGet,
 			"/cars/{carID}",
 			apifunctions.ReturnCar,
-		}, /*
-			route{
-				"DeleteCar",
-				http.MethodDelete,
-				"/cars/{carID}",
-				apifunctions.DeleteCar,
-			},*/
+		},
+		route{
+			"DeleteCar",
+			http.MethodDelete,
+			"/cars/{carID}",
+			apifunctions.DeleteCar,
+		},
 		route{
 			"getSpecificItem",
 			http.MethodGet,

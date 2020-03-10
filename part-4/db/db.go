@@ -11,14 +11,12 @@ import (
 
 /*CRUD All function that you can use in this interface.*/
 type CRUD interface {
-	//LoadFile() error
 	Add(string) error
 	Retrieve(string) (fileinteraction.Item, error)
 	RetrieveAll() (fileinteraction.Items, error)
 	Update(string, string) error
 	Delete(string) error
-	//SaveFile() error
-	//DeleteFile() error
+	DeleteCar() error
 }
 
 /*Database Contain a map with the items in the Database */
@@ -30,11 +28,12 @@ type Database struct {
 /*CreateNewDBInstance create new instance of the object using the directory and carID
 
 If createNewDB is true CreateNewDBInstance only create the file and return a nil *Database*/
-func CreateNewDBInstance(directory string, carID string, a bool) (*Database, error) {
+func CreateNewDBInstance(directory string, carID string, newDB bool) (*Database, error) {
+	var err error
 	dataBase := &Database{}
 	dataBase.mux = &sync.Mutex{}
-	dataBase.db = mongodb.CreateNewDBInstance(directory, carID)
-	return dataBase, nil
+	dataBase.db, err = mongodb.CreateNewDBInstance(directory, carID, newDB)
+	return dataBase, err
 }
 
 /*Add add item to car
@@ -107,4 +106,9 @@ func (d *Database) Delete(id string) error {
 	defer d.mux.Unlock()
 
 	return d.db.DeleteItem(id)
+}
+
+/*DeleteCar algo*/
+func (d *Database) DeleteCar() error {
+	return d.db.DeleteColection()
 }

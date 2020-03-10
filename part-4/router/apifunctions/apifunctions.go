@@ -37,14 +37,14 @@ func response(w http.ResponseWriter, status int, results interface{}) {
 
 /*CreateNewCar return
 
-status 201 if the car is already exist
+status 201 if the car is already exist*/
 func CreateNewCar(w http.ResponseWriter, r *http.Request) {
 	if _, err := db.CreateNewDBInstance(directoyDB, mux.Vars(r)[carPath], true); err != nil {
 		errorResponse(w, http.StatusCreated, err)
 		return
 	}
 	response(w, http.StatusOK, nil)
-}*/
+}
 
 /*ReturnCar return
 
@@ -68,7 +68,7 @@ func ReturnCar(w http.ResponseWriter, r *http.Request) {
 
 /*DeleteCar return
 
-status 404 if the car does not exist or the car does not deleted
+status 404 if the car does not exist or the car does not deleted*/
 func DeleteCar(w http.ResponseWriter, r *http.Request) {
 	myDB, err := db.CreateNewDBInstance(directoyDB, mux.Vars(r)[carPath], false)
 	if err != nil {
@@ -76,13 +76,13 @@ func DeleteCar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if er := myDB.DeleteFile(); er != nil {
+	if er := myDB.DeleteCar(); er != nil {
 		errorResponse(w, http.StatusNotFound, er)
 		return
 	}
 
 	response(w, http.StatusOK, nil)
-}*/
+}
 
 /*ReturnItem return
 

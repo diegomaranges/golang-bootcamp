@@ -21,13 +21,7 @@ func TestNewRoute(t *testing.T) {
 			name: "Refresh",
 		},
 		{
-			name: "CreateNewCar",
-		},
-		{
 			name: "getSpecificCar",
-		},
-		{
-			name: "DeleteCar",
 		},
 		{
 			name: "getSpecificItem",

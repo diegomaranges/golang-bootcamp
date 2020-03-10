@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"errors"
+	"strings"
 
 	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db/mongodb/fileinteraction"
 	"gopkg.in/mgo.v2"
@@ -36,11 +37,39 @@ func getSession() *mgo.Session {
 }
 
 /*CreateNewDBInstance create a new mongo struncture*/
-func CreateNewDBInstance(directory string, carID string) *MongoStruct {
+func CreateNewDBInstance(directory string, carID string, newDB bool) (*MongoStruct, error) {
 	mongodb := &MongoStruct{}
+	db := getSession().DB("CarApi")
+
+	colections, err := db.CollectionNames()
+	if err != nil {
+		return mongodb, err
+	}
+
+	if newDB {
+		for _, colection := range colections {
+			if strings.Compare(colection, "Car"+carID) == 0 {
+				return mongodb, errors.New("db is already exist")
+			}
+		}
+		mongodb.collection = db.C("Car" + carID)
+		return mongodb, nil
+	}
+
+	exist := false
+	for _, colection := range colections {
+		if strings.Compare(colection, "Car"+carID) == 0 {
+			exist = true
+			break
+		}
+	}
+
+	if !exist {
+		return mongodb, errors.New("db does not exist")
+	}
 	mongodb.file = fileinteraction.CreateNewFInstance(directory, carID)
-	mongodb.collection = getSession().DB("CarApi").C("Car" + carID)
-	return mongodb
+	mongodb.collection = db.C("Car" + carID)
+	return mongodb, nil
 }
 
 /*LoadBackUp algo*/
@@ -146,4 +175,9 @@ func (m *MongoStruct) GenerateBackUp() error {
 	}
 
 	return m.file.WriteFile(*items)
+}
+
+/*DeleteColection algo*/
+func (m *MongoStruct) DeleteColection() error {
+	return m.collection.DropCollection()
 }
