@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db/mongodb/fileinteraction"
@@ -17,12 +18,10 @@ type MongoDb interface {
 	ReturnAllItems() (fileinteraction.Item, error)
 	UpdateItem(id string, item fileinteraction.Item) error
 	DeleteItem(id string) error
-	GenerateBackUp() error
 }
 
 /*MongoStruct MongoDb Sctruct*/
 type MongoStruct struct {
-	file       *fileinteraction.DestinyFile
 	collection *mgo.Collection
 }
 
@@ -37,7 +36,7 @@ func getSession() *mgo.Session {
 }
 
 /*CreateNewDBInstance create a new mongo struncture*/
-func CreateNewDBInstance(directory string, carID string, newDB bool) (*MongoStruct, error) {
+func CreateNewDBInstance(carID string, newDB bool) (*MongoStruct, error) {
 	mongodb := &MongoStruct{}
 	db := getSession().DB("CarApi")
 
@@ -67,12 +66,11 @@ func CreateNewDBInstance(directory string, carID string, newDB bool) (*MongoStru
 	if !exist {
 		return mongodb, errors.New("db does not exist")
 	}
-	mongodb.file = fileinteraction.CreateNewFInstance(directory, carID)
 	mongodb.collection = db.C("Car" + carID)
 	return mongodb, nil
 }
 
-/*LoadBackUp algo*/
+/*LoadBackUp algo
 func (m *MongoStruct) LoadBackUp() error {
 	items := &fileinteraction.Items{}
 	if err := m.file.ReadFile(items); err != nil {
@@ -90,7 +88,7 @@ func (m *MongoStruct) LoadBackUp() error {
 	}
 
 	return nil
-}
+}*/
 
 /*AddItem create new mongodb document, Return an error if:
 
@@ -167,14 +165,26 @@ func (m *MongoStruct) DeleteItem(id string) error {
 }
 
 /*GenerateBackUp algo*/
-func (m *MongoStruct) GenerateBackUp() error {
+func GenerateBackUp() error {
+	db := getSession().DB("CarApi")
 	items := &fileinteraction.Items{}
-
-	if err := m.collection.Find(nil).All(&items); err != nil {
+	colections, err := db.CollectionNames()
+	if err != nil {
 		return err
 	}
+	for _, colection := range colections {
+		file := fileinteraction.CreateNewFInstance("backup/", colection)
+		if er := db.C(colection).Find(nil).All(items); err != nil {
+			fmt.Println(colection)
+			return er
+		}
+		if er := file.WriteFile(*items); er != nil {
+			fmt.Println(colection)
+			return er
+		}
+	}
 
-	return m.file.WriteFile(*items)
+	return nil
 }
 
 /*DeleteColection algo*/

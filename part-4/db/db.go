@@ -28,11 +28,11 @@ type Database struct {
 /*CreateNewDBInstance create new instance of the object using the directory and carID
 
 If createNewDB is true CreateNewDBInstance only create the file and return a nil *Database*/
-func CreateNewDBInstance(directory string, carID string, newDB bool) (*Database, error) {
+func CreateNewDBInstance(carID string, newDB bool) (*Database, error) {
 	var err error
 	dataBase := &Database{}
 	dataBase.mux = &sync.Mutex{}
-	dataBase.db, err = mongodb.CreateNewDBInstance(directory, carID, newDB)
+	dataBase.db, err = mongodb.CreateNewDBInstance(carID, newDB)
 	return dataBase, err
 }
 
@@ -111,4 +111,9 @@ func (d *Database) Delete(id string) error {
 /*DeleteCar algo*/
 func (d *Database) DeleteCar() error {
 	return d.db.DeleteColection()
+}
+
+/*Backup algo*/
+func Backup() (string, error) {
+	return "generete backup, error: ", mongodb.GenerateBackUp()
 }
