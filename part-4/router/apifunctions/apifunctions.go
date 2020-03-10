@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db"
 )
@@ -36,54 +35,16 @@ func response(w http.ResponseWriter, status int, results interface{}) {
 	json.NewEncoder(w).Encode(results)
 }
 
-func checkIfLogIn(w http.ResponseWriter, r *http.Request) int {
-	// We can obtain the session token from the requests cookies, which come with every request
-	c, err := r.Cookie("token")
-	if err != nil {
-		if err == http.ErrNoCookie {
-			// If the cookie is not set, return an unauthorized status
-			return http.StatusUnauthorized
-		}
-		// For any other type of error, return a bad request status
-		return http.StatusBadRequest
-	}
-
-	// Get the JWT string from the cookie
-	tknStr := c.Value
-
-	// Initialize a new instance of `Claims`
-	claims := &Claims{}
-
-	// Parse the JWT string and store the result in `claims`.
-	// Note that we are passing the key in this method as well. This method will return an error
-	// if the token is invalid (if it has expired according to the expiry time we set on sign in),
-	// or if the signature does not match
-	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
-	})
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			return http.StatusUnauthorized
-		}
-		return http.StatusBadRequest
-	}
-	if !tkn.Valid {
-		return http.StatusUnauthorized
-	}
-
-	return http.StatusOK
-}
-
 /*CreateNewCar return
 
-status 201 if the car is already exist*/
+status 201 if the car is already exist
 func CreateNewCar(w http.ResponseWriter, r *http.Request) {
 	if _, err := db.CreateNewDBInstance(directoyDB, mux.Vars(r)[carPath], true); err != nil {
 		errorResponse(w, http.StatusCreated, err)
 		return
 	}
 	response(w, http.StatusOK, nil)
-}
+}*/
 
 /*ReturnCar return
 
@@ -97,12 +58,7 @@ func ReturnCar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if er := dataBase.LoadFile(); er != nil {
-		errorResponse(w, http.StatusConflict, er)
-		return
-	}
-
-	carMap, err := dataBase.ReturnMap()
+	carMap, err := dataBase.RetrieveAll()
 	if err != nil {
 		errorResponse(w, http.StatusConflict, err)
 		return
@@ -112,7 +68,7 @@ func ReturnCar(w http.ResponseWriter, r *http.Request) {
 
 /*DeleteCar return
 
-status 404 if the car does not exist or the car does not deleted*/
+status 404 if the car does not exist or the car does not deleted
 func DeleteCar(w http.ResponseWriter, r *http.Request) {
 	myDB, err := db.CreateNewDBInstance(directoyDB, mux.Vars(r)[carPath], false)
 	if err != nil {
@@ -126,7 +82,7 @@ func DeleteCar(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response(w, http.StatusOK, nil)
-}
+}*/
 
 /*ReturnItem return
 
@@ -137,11 +93,6 @@ func ReturnItem(w http.ResponseWriter, r *http.Request) {
 	dataBase, err := db.CreateNewDBInstance(directoyDB, mux.Vars(r)[carPath], false)
 	if err != nil {
 		errorResponse(w, http.StatusNotFound, err)
-		return
-	}
-
-	if er := dataBase.LoadFile(); er != nil {
-		errorResponse(w, http.StatusConflict, er)
 		return
 	}
 
@@ -166,18 +117,8 @@ func AddItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if er := dataBase.LoadFile(); er != nil {
-		errorResponse(w, http.StatusConflict, er)
-		return
-	}
-
 	itemID := mux.Vars(r)[itemPath]
 	if er := dataBase.Add(itemID); er != nil {
-		errorResponse(w, http.StatusConflict, er)
-		return
-	}
-
-	if er := dataBase.SaveFile(); er != nil {
 		errorResponse(w, http.StatusConflict, er)
 		return
 	}
@@ -204,11 +145,6 @@ func UpdateItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if er := dataBase.LoadFile(); er != nil {
-		errorResponse(w, http.StatusConflict, er)
-		return
-	}
-
 	itemID := mux.Vars(r)[itemPath]
 	var item Item
 	data, err := ioutil.ReadAll(r.Body)
@@ -222,12 +158,7 @@ func UpdateItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if er := dataBase.Update(itemID, item.ID); er != nil {
-		errorResponse(w, http.StatusConflict, er)
-		return
-	}
-
-	if er := dataBase.SaveFile(); er != nil {
+	if er := dataBase.Update(itemID, item.Quantity); er != nil {
 		errorResponse(w, http.StatusConflict, er)
 		return
 	}
@@ -252,19 +183,9 @@ func DeleteItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if er := dataBase.LoadFile(); er != nil {
-		errorResponse(w, http.StatusConflict, er)
-		return
-	}
-
 	itemID := mux.Vars(r)[itemPath]
 	if err := dataBase.Delete(itemID); err != nil {
 		errorResponse(w, http.StatusNotFound, err)
-		return
-	}
-
-	if err := dataBase.SaveFile(); err != nil {
-		errorResponse(w, http.StatusConflict, err)
 		return
 	}
 

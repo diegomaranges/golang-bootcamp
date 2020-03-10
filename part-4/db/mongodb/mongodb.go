@@ -3,31 +3,25 @@ package mongodb
 import (
 	"errors"
 
+	"github.corp.globant.com/diego-maranges/GolangBootcamp/part-4/db/mongodb/fileinteraction"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
-/*Item is a struct used for read element from the Json requests*/
-type Item struct {
-	ID       string `bson:"_id,omitempty"`
-	Title    string `json:"title"`
-	Price    string `json:"price"`
-	Quantity int    `json:"quantity"`
-}
-
 /*MongoDb interface*/
 type MongoDb interface {
-	//loadbackup
-	AddItem(item Item) error
-	ReturnItem(id string) (Item, error)
-	//returnall
-	UpdateItem(id string, item Item) error
+	LoadBackUp() error
+	AddItem(item fileinteraction.Item) error
+	ReturnItem(id string) (fileinteraction.Item, error)
+	ReturnAllItems() (fileinteraction.Item, error)
+	UpdateItem(id string, item fileinteraction.Item) error
 	DeleteItem(id string) error
-	//savedata
+	GenerateBackUp() error
 }
 
 /*MongoStruct MongoDb Sctruct*/
 type MongoStruct struct {
+	file       *fileinteraction.DestinyFile
 	collection *mgo.Collection
 }
 
@@ -42,10 +36,31 @@ func getSession() *mgo.Session {
 }
 
 /*CreateNewDBInstance create a new mongo struncture*/
-func CreateNewDBInstance(id string) *MongoStruct {
+func CreateNewDBInstance(directory string, carID string) *MongoStruct {
 	mongodb := &MongoStruct{}
-	mongodb.collection = getSession().DB("CarApi").C("Car" + id)
+	mongodb.file = fileinteraction.CreateNewFInstance(directory, carID)
+	mongodb.collection = getSession().DB("CarApi").C("Car" + carID)
 	return mongodb
+}
+
+/*LoadBackUp algo*/
+func (m *MongoStruct) LoadBackUp() error {
+	items := &fileinteraction.Items{}
+	if err := m.file.ReadFile(items); err != nil {
+		return err
+	}
+
+	if err := m.collection.DropCollection(); err != nil {
+		return err
+	}
+
+	for _, item := range *items {
+		if err := m.collection.Insert(item); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 /*AddItem create new mongodb document, Return an error if:
@@ -53,13 +68,14 @@ func CreateNewDBInstance(id string) *MongoStruct {
 function can not access to mongo db
 
 does not exist the element*/
-func (m *MongoStruct) AddItem(item Item) error {
+func (m *MongoStruct) AddItem(item fileinteraction.Item) error {
 	numOfElements, err := m.collection.Find(bson.M{"_id": item.ID}).Count()
 	if err != nil {
 		return err
 	}
 
 	if numOfElements == 1 {
+		item.Quantity++
 		return m.collection.Update(bson.M{"_id": item.ID}, item)
 	}
 
@@ -71,10 +87,19 @@ func (m *MongoStruct) AddItem(item Item) error {
 function can not access to mongo db
 
 does not exist the element*/
-func (m *MongoStruct) ReturnItem(id string) (Item, error) {
-	result := &Item{}
+func (m *MongoStruct) ReturnItem(id string) (fileinteraction.Item, error) {
+	result := &fileinteraction.Item{}
 	err := m.collection.Find(bson.M{"_id": id}).One(&result)
 	return *result, err
+}
+
+/*ReturnAllItems Return an error if:
+
+function can not access to mongo db*/
+func (m *MongoStruct) ReturnAllItems() (fileinteraction.Items, error) {
+	var items fileinteraction.Items
+	err := m.collection.Find(nil).All(&items)
+	return items, err
 }
 
 /*UpdateItem Return an error if:
@@ -84,17 +109,23 @@ function can not access to mongo db
 does not exist the element
 
 or id is not the same to item.id*/
-func (m *MongoStruct) UpdateItem(id string, item Item) error {
-	numOfElements, err := m.collection.Find(bson.M{"_id": id}).Count()
+func (m *MongoStruct) UpdateItem(id string, quantity int) error {
+	if quantity <= 0 {
+		return errors.New("Wrong quantity imput")
+	}
+
+	myItem := &fileinteraction.Item{}
+	err := m.collection.Find(bson.M{"_id": id}).One(&myItem)
 	if err != nil {
 		return err
 	}
 
-	if numOfElements == 0 {
+	if myItem == nil {
 		return errors.New("not found")
 	}
 
-	return m.collection.Update(bson.M{"_id": id}, item)
+	myItem.Quantity = quantity
+	return m.collection.Update(bson.M{"_id": id}, myItem)
 }
 
 /*DeleteItem Return an error if:
@@ -104,4 +135,15 @@ function can not access to mongo db
 does not exist the element*/
 func (m *MongoStruct) DeleteItem(id string) error {
 	return m.collection.Remove(bson.M{"_id": id})
+}
+
+/*GenerateBackUp algo*/
+func (m *MongoStruct) GenerateBackUp() error {
+	items := &fileinteraction.Items{}
+
+	if err := m.collection.Find(nil).All(&items); err != nil {
+		return err
+	}
+
+	return m.file.WriteFile(*items)
 }

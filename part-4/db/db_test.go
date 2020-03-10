@@ -1,5 +1,6 @@
 package db
 
+/*
 import (
 	"errors"
 	"testing"
@@ -298,4 +299,4 @@ func TestDeleteFile(t *testing.T) {
 	assert.NoError(t, err, "error: tring create a new db instance")
 
 	assert.NoError(t, tempDB.DeleteFile(), "error: does not delete the map")
-}
+}*/

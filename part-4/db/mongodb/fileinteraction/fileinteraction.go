@@ -7,8 +7,12 @@ import (
 	"os"
 )
 
-/*Items is a structure used for read json files*/
-type Items struct {
+/*Items algo*/
+type Items []Item
+
+/*Item is a struct used for read element from the Json requests*/
+type Item struct {
+	ID       string `bson:"_id,omitempty"`
 	Title    string `json:"title"`
 	Price    string `json:"price"`
 	Quantity int    `json:"quantity"`
@@ -17,8 +21,8 @@ type Items struct {
 /*FileActions have all function for handle the interecctions with files*/
 type FileActions interface {
 	CreateFile() error
-	ReadFile(map[string]*Items) error
-	WriteFile(map[string]*Items) error
+	ReadFile(Items) error
+	WriteFile(Items) error
 	DeleteFile() error
 	ReturnDestinyFile() string
 }
@@ -58,9 +62,9 @@ func (d *DestinyFile) CreateFile() error {
 
 Warning: If the map element have some information it will delete
 
-Pre: externalMap different to nil*/
-func (d *DestinyFile) ReadFile(externalMap map[string]*Items) error {
-	if externalMap == nil {
+Pre: externalStruct different to nil*/
+func (d *DestinyFile) ReadFile(externalStruct *Items) error {
+	if externalStruct == nil {
 		return errors.New("map is not initialized")
 	}
 
@@ -69,7 +73,7 @@ func (d *DestinyFile) ReadFile(externalMap map[string]*Items) error {
 		return err
 	}
 
-	if err := json.Unmarshal(fileBytes, &externalMap); err != nil {
+	if err := json.Unmarshal(fileBytes, &externalStruct); err != nil {
 		return err
 	}
 
@@ -78,13 +82,13 @@ func (d *DestinyFile) ReadFile(externalMap map[string]*Items) error {
 
 /*WriteFile write information in file saved
 
-Pre: externalMap different to nil*/
-func (d *DestinyFile) WriteFile(externalMap map[string]*Items) error {
-	if externalMap == nil {
+Pre: externalStruct different to nil*/
+func (d *DestinyFile) WriteFile(externalStruct Items) error {
+	if externalStruct == nil {
 		return errors.New("map is not initialized")
 	}
 
-	jsonString, err := json.Marshal(externalMap)
+	jsonString, err := json.Marshal(externalStruct)
 	if err != nil {
 		return err
 	}
