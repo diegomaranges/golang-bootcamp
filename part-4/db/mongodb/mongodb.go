@@ -48,7 +48,11 @@ func CreateNewDBInstance(id string) *MongoStruct {
 	return mongodb
 }
 
-/*AddItem create new mongodb document*/
+/*AddItem create new mongodb document, Return an error if:
+
+function can not access to mongo db
+
+does not exist the element*/
 func (m *MongoStruct) AddItem(item Item) error {
 	numOfElements, err := m.collection.Find(bson.M{"_id": item.ID}).Count()
 	if err != nil {
@@ -62,19 +66,25 @@ func (m *MongoStruct) AddItem(item Item) error {
 	return m.collection.Insert(item)
 }
 
-/*ReturnItem algo*/
+/*ReturnItem Return an error if:
+
+function can not access to mongo db
+
+does not exist the element*/
 func (m *MongoStruct) ReturnItem(id string) (Item, error) {
 	result := &Item{}
 	err := m.collection.Find(bson.M{"_id": id}).One(&result)
 	return *result, err
 }
 
-/*UpdateItem algo*/
-func (m *MongoStruct) UpdateItem(id string, item Item) error {
-	if id != item.ID {
-		return errors.New("_id value is not the same")
-	}
+/*UpdateItem Return an error if:
 
+function can not access to mongo db
+
+does not exist the element
+
+or id is not the same to item.id*/
+func (m *MongoStruct) UpdateItem(id string, item Item) error {
 	numOfElements, err := m.collection.Find(bson.M{"_id": id}).Count()
 	if err != nil {
 		return err
@@ -87,7 +97,11 @@ func (m *MongoStruct) UpdateItem(id string, item Item) error {
 	return m.collection.Update(bson.M{"_id": id}, item)
 }
 
-/*DeleteItem algo*/
+/*DeleteItem Return an error if:
+
+function can not access to mongo db
+
+does not exist the element*/
 func (m *MongoStruct) DeleteItem(id string) error {
 	return m.collection.Remove(bson.M{"_id": id})
 }
