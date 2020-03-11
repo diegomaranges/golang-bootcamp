@@ -13,8 +13,8 @@ import (
 
 func backup() {
 	for {
-		fmt.Println(db.Backup())
 		time.Sleep(12 * time.Hour)
+		fmt.Println(db.Backup())
 	}
 }
 

@@ -51,8 +51,8 @@ func CreateNewDBInstance(carID string, newDB bool) (*MongoStruct, error) {
 				return mongodb, errors.New("db is already exist")
 			}
 		}
-		mongodb.collection = db.C("Car" + carID)
-		return mongodb, nil
+		info := &mgo.CollectionInfo{}
+		return mongodb, db.C("Car" + carID).Create(info)
 	}
 
 	exist := false
